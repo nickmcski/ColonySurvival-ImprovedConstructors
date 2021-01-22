@@ -1,0 +1,11 @@
+[
+  {
+    "dllpath": "ImprovedConstruction.dll",
+    "name": "ImprovedConstruction",
+    "version": "0.8.2.0",
+    "marksgamemodded": false,
+    "compatibleversions": [
+      "0.8.0"
+    ]
+  }
+]
