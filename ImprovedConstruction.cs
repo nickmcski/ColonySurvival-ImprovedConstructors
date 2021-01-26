@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using Jobs;
+﻿using Jobs;
 using Jobs.Implementations.Construction;
 using ModLoaderInterfaces;
 using NetworkUI;
@@ -8,6 +7,7 @@ using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
 using Pipliz.JSON;
+using Science;
 using Shared;
 using System;
 using System.Reflection;
@@ -15,47 +15,68 @@ using System.Reflection;
 namespace Improved_Construction
 {
     [ModLoader.ModManager]
-    public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnPlayerSelectedTypePopup
+    public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnPlayerSelectedTypePopup, IOnAssemblyLoaded
     {
-        static string MODPATH;
 
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "Wingdings.ImprovedConstruction.OnAssemblyLoaded")]
-        public static void OnAssemblyLoaded(string path)
+        public void OnAssemblyLoaded(string path)
         {
-            // Get a nicely formatted version of our mod directory.
-            MODPATH = System.IO.Path.GetDirectoryName(path).Replace("\\", "/");
-            Log.Write("Better Chat initialized in " + MODPATH);
-
-            //var harmony = new Harmony("Nick.BetterChat.Harmony");
-            //harmony.PatchAll(Assembly.GetExecutingAssembly());
+            //Register loader for Construction job callback
             ConstructionArea.RegisterLoader((IConstructionLoader)new ReplacerSpecialLoader());
-            Players.Player player = null;
-            NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, null);
+            ConstructionArea.RegisterLoader((IConstructionLoader)new ShapeBuilderLoader("wingdings.walls"));
+            ConstructionArea.RegisterLoader((IConstructionLoader)new ShapeBuilderLoader("wingdings.pyramid"));
+            ConstructionArea.RegisterLoader((IConstructionLoader)new ShapeBuilderLoader("wingdings.circle"));
 
 
-
-            //CommandToolManager.AreaDescriptions.Add("wingdings.replacer", (IToolDescription)new ConstructionAreaToolSettings("popup.tooljob.replacer", "wingdings.replacer", "wingdings.replacer", EConstructionKind.Digger, 0, EAreaItemSelectionFilter.ComboDiggable));
-            CustomConstructionAreaJobDefinition deff = new CustomConstructionAreaJobDefinition();
-            AreaJobTracker.RegisterAreaJobDefinition(deff);
+            //Override identifier so we can create our own callback using the Construction Job
+            AreaJobTracker.RegisterAreaJobDefinition(new CustomConstructionAreaJobDefinition());
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.walls", "wingdings.walls", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.pyramid", "wingdings.pyramid", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.circle", "wingdings.circle", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
         }
 
         public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)
         {
+            if (menuName != "popup.tooljob.construction")
+                return;
             menu.Items.Add((IItem)new EmptySpace(20));
-            ButtonCallback button = new ButtonCallback("wingdings.replacer", new LabelData("popup.tooljob.replacer", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 200, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true);
-            CommandToolManager.GenerateTwoColumnCenteredRow(menu, button, CommandToolManager.GetButtonTool(p, "constructionjob", "popup.tooljob.constructionjob", 200, true));
+
+            bool unlocked = CommandToolManager.NPCAreaUnlocked(p, "pipliz.builder", out ScienceKey? _);
+            ButtonCallback button = new ButtonCallback("wingdings.replacer", new LabelData("wingdings.tooljob.replacer", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 200, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
+            {
+                Enabled = unlocked
+            };
+
+            ButtonCallback button2 = new ButtonCallback("windings.shapes", new LabelData("wingdings.tooljob.shapes", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 200, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
+            {
+                Enabled = unlocked
+            };
+            CommandToolManager.GenerateTwoColumnCenteredRow(menu, button, button2);
+        }
+
+        public void SendShapeMenu(Players.Player player)
+        {
+            NetworkMenu menuBase = CommandToolManager.GenerateMenuBase(player, true);
+            CommandToolManager.GenerateTwoColumnCenteredRow(menuBase, CommandToolManager.GetButtonTool(player, "wingdings.tooljob.walls", "wingdings.tooljob.walls", 200, true), CommandToolManager.GetButtonTool(player, "wingdings.tooljob.pyramid", "wingdings.tooljob.pyramid", 200, true));
+            menuBase.Items.Add((IItem)new EmptySpace(20));
+            //menuBase.Items.Add(CommandToolManager.GetButtonTool(player, "wingdings.tooljob.circle", "wingdings.tooljob.circle", 200, true));
+            CommandToolManager.GenerateTwoColumnCenteredRow(menuBase, CommandToolManager.GetButtonTool(player, "wingdings.tooljob.circle", "wingdings.tooljob.circle", 200, true), (IItem)new EmptySpace(20));
+            NetworkMenuManager.SendServerPopup(player, menuBase);
         }
 
         public void OnPlayerPushedNetworkUIButton(ButtonPressCallbackData data)
         {
-            Log.Write("Network button pushed!" + data.ButtonIdentifier);
-            if (!(data.ButtonIdentifier == "wingdings.replacer"))
-                return;
-            //NetworkMenuManager.CloseServerPopup(data.Player);
-            JSONNode payload = new JSONNode(NodeType.Object).SetAs<int>("wingdings.construction.selection", 1);
-            NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, payload);
-            Log.Write("Sent!");
-
+            switch (data.ButtonIdentifier)
+            {
+                case "wingdings.replacer":
+                    JSONNode payload = new JSONNode(NodeType.Object).SetAs<int>("wingdings.construction.selection", 1);
+                    NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, payload);
+                    return;
+                case "windings.shapes":
+                    SendShapeMenu(data.Player);
+                    return;
+                default:
+                    return;
+            }
         }
 
         public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JSONNode payload)
@@ -67,52 +88,41 @@ namespace Improved_Construction
             switch (result)
             {
                 case 1:
+                    payload.SetAs<int>("wingdings.construction.selection1", typeSelected);
+                    payload.SetAs<int>("wingdings.construction.selection", 2);
 
-                    {
-                        Log.Write("Got selection 1");
-                        payload.SetAs<int>("wingdings.construction.selection1", typeSelected);
-                        payload.SetAs<int>("wingdings.construction.selection", 2);
-                        //NetworkMenuManager.CloseServerPopup(player);
-                        NetworkMenu menu = new NetworkMenu();
-                        NetworkMenuManager.SendServerPopup(player, menu);
-                        NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, payload);
-                        Log.Write("Sent For Round 2!");
-                        break;
-                    }
+                    //Send blank menu. TriggerTypeSelectionPopup will only work when a menu is open
+                    NetworkMenu menu = new NetworkMenu();
+                    NetworkMenuManager.SendServerPopup(player, menu);
+
+                    NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, payload);
+                    break;
                 case 2:
+                    payload.SetAs<int>("wingdings.construction.selection2", typeSelected);
+                    payload.SetAs<string>("constructionType", "wingdings.customconstruction");
+
+                    int limt = player.ActiveColony?.BuilderSizeLimit ?? Colony.BUILDER_LIMIT_START;
+
+                    GenericCommandToolSettings data = new GenericCommandToolSettings()
                     {
-                        Log.Write("Got selection 2");
-
-                        ConstructionAreaToolSettings data1 = new ConstructionAreaToolSettings("wingdings.test", "wingdings.customconstruction", "pipliz.digger", EConstructionKind.Digger);
-
-                        GenericCommandToolSettings data =  new GenericCommandToolSettings()
-                        {
-                            JSONData = payload,
-                            Maximum2DBlockCount = 100,
-                            Minimum2DBlockCount = 6,
-                            Maximum3DBlockCount = 1000,
-                            Minimum3DBlockCount = 6,
-                            MaximumHeight = 100,
-                            MinimumHeight = 1,
-                            OneAreaOnly = true,
-                            Key = "wingdings.customconstruction",
-                            NPCTypeKey = "Wingdings.test2",
-                            TranslationKey = "Wingdings.test3"
-                        };
-                        CommandToolManager.StartCommandToolSelection(player, data1);
-
-                        break;
-                    }
+                        JSONData = payload,
+                        Maximum2DBlockCount = limt,
+                        Minimum2DBlockCount = 1,
+                        Maximum3DBlockCount = limt,
+                        Minimum3DBlockCount = 1,
+                        MaximumHeight = 100,
+                        MinimumHeight = 1,
+                        OneAreaOnly = true,
+                        Key = "wingdings.customconstruction",
+                        NPCTypeKey = "pipliz.digger",
+                        TranslationKey = "Wingdings.customconstruction"
+                    };
+                    CommandToolManager.StartCommandToolSelection(player, data);
+                    break;
                 default:
-                    {
-                        Log.WriteError("Unexpected case! " + payload.ToString());
-                        break;
-                    }
+                    Log.WriteError("Unexpected case! " + payload.ToString());
+                    break;
             }
-            Log.Write(payload.ToString());
-
         }
-
-
     }
 }

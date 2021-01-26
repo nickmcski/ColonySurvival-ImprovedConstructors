@@ -1,0 +1,11 @@
+{
+	"ghost": {
+		"categories": [
+			"decorative"
+		],
+		"icon": "./textures/glass.png",
+		"isSolid": false,
+		"sideall": "SELF",
+		"lightingTransparency": 255
+	}
+}

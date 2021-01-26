@@ -2,10 +2,24 @@
   {
     "dllpath": "ImprovedConstruction.dll",
     "name": "ImprovedConstruction",
-    "version": "0.8.2.0",
+    "version": "0.1.0.0",
     "marksgamemodded": false,
     "compatibleversions": [
       "0.8.0"
+    ],
+    "jsonFiles": [
+      {
+        "fileType": "addOrOverrideLocalization",
+        "relativePath": "en-US.json"
+      },
+      {
+        "fileType": "addNewTypes",
+        "relativePath": "types.json"
+      },
+      {
+        "fileType": "addOrOverrideTextureMappingEntries",
+        "relativePath": "texturemapping.json"
+      }
     ]
   }
 ]

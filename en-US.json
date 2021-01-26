@@ -1,0 +1,13 @@
+{
+  "sentences": {
+    "wingdings": {
+      "tooljob": {
+        "replacer": "Replacer",
+        "shapes": "Custom Shapes",
+        "walls": "Walls",
+        "pyramid": "Pyramid",
+        "circle": "Circle"
+      }
+    }
+  }
+}

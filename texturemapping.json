@@ -1,0 +1,12 @@
+{
+	"_settings": {
+		"fileExtension": ".png",
+		"folderAlbedo": "./textures/",
+		"folderEmissive": "./textures/",
+		"folderHeight": "./textures/",
+		"folderNormal": "./textures/"
+	},
+	"ghost": {
+		"albedo": "green_stained_glass"
+	}
+}
