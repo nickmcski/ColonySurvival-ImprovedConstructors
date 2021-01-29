@@ -26,12 +26,11 @@ namespace Improved_Construction
             ConstructionArea.RegisterLoader((IConstructionLoader)new ShapeBuilderLoader("wingdings.pyramid"));
             ConstructionArea.RegisterLoader((IConstructionLoader)new ShapeBuilderLoader("wingdings.circle"));
 
-
             //Override identifier so we can create our own callback using the Construction Job
             AreaJobTracker.RegisterAreaJobDefinition(new CustomConstructionAreaJobDefinition());
-            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.walls", "wingdings.walls", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
-            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.pyramid", "wingdings.pyramid", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
-            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.circle", "wingdings.circle", "wingdings.diggerspecial", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.walls", "wingdings.walls", "wingdings.builder.2D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.pyramid", "wingdings.pyramid", "wingdings.builder.3D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+            CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.circle", "wingdings.circle", "wingdings.builder.2D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
         }
 
         public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)
@@ -53,12 +52,11 @@ namespace Improved_Construction
             CommandToolManager.GenerateTwoColumnCenteredRow(menu, button, button2);
         }
 
-        public void SendShapeMenu(Players.Player player)
+        public static void SendShapeMenu(Players.Player player)
         {
             NetworkMenu menuBase = CommandToolManager.GenerateMenuBase(player, true);
             CommandToolManager.GenerateTwoColumnCenteredRow(menuBase, CommandToolManager.GetButtonTool(player, "wingdings.tooljob.walls", "wingdings.tooljob.walls", 200, true), CommandToolManager.GetButtonTool(player, "wingdings.tooljob.pyramid", "wingdings.tooljob.pyramid", 200, true));
             menuBase.Items.Add((IItem)new EmptySpace(20));
-            //menuBase.Items.Add(CommandToolManager.GetButtonTool(player, "wingdings.tooljob.circle", "wingdings.tooljob.circle", 200, true));
             CommandToolManager.GenerateTwoColumnCenteredRow(menuBase, CommandToolManager.GetButtonTool(player, "wingdings.tooljob.circle", "wingdings.tooljob.circle", 200, true), (IItem)new EmptySpace(20));
             NetworkMenuManager.SendServerPopup(player, menuBase);
         }
@@ -84,7 +82,6 @@ namespace Improved_Construction
             int result;
             if (!payload.TryGetAs<int>("wingdings.construction.selection", out result))
                 return;
-
             switch (result)
             {
                 case 1:
@@ -94,7 +91,7 @@ namespace Improved_Construction
                     //Send blank menu. TriggerTypeSelectionPopup will only work when a menu is open
                     NetworkMenu menu = new NetworkMenu();
                     NetworkMenuManager.SendServerPopup(player, menu);
-
+                    
                     NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, payload);
                     break;
                 case 2:
