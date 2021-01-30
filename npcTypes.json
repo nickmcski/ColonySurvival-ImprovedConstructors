@@ -1,0 +1,16 @@
+[
+	{
+		"data" : {
+			"maskColor1" : "#FF00FF"
+		},
+		"keyName" : "wingdings.builder.2d",
+		"npcType" : "worker"
+	},
+	{
+		"data" : {
+			"maskColor1" : "#FF00FF"
+		},
+		"keyName" : "wingdings.builder.3d",
+		"npcType" : "worker"
+	}
+]

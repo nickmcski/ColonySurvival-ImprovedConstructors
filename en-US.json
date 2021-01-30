@@ -3,10 +3,32 @@
     "wingdings": {
       "tooljob": {
         "replacer": "Replacer",
+        "replacera": "Replace one block for another",
+        "replacerb": "Select the block you want to remove, then the block it should be filled with,",
         "shapes": "Custom Shapes",
         "walls": "Walls",
+        "wallsa": "Builds the outside walls",
+        "wallsb": "Select the material you want to use, then select the area to build the walls.",
         "pyramid": "Pyramid",
-        "circle": "Circle"
+        "pyramida": "Builds a hollow pyramid in your selection",
+        "pyramidb": "Select the material you want to use, then select the area to build.",
+        "circle": "Circle",
+        "circlea": "Builds a verticle cylinder",
+        "circleb": "Select the material you want to use, then the area your circle should be built"
+      },
+      "research": {
+        "2d": {
+          "name" : "Basic Geometry",
+          "description" : "Congratulations! It was difficuly, but your colonists understand what a circle is"
+        },
+        "3d": {
+          "name" : "Advanced Geometry",
+          "description" : "Are you smarter than a 5th grader?"
+        }
+      },
+      "builder": {
+        "2d": "2D Builder",
+        "3d": "3D Builder"
       }
     }
   }

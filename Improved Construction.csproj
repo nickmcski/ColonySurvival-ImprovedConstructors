@@ -32,13 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\Harmony.2.0.4.0\net472\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Q:\GAMES\Steam\steamapps\common\Colony Survival\colonyserver_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="fNbt, Version=0.6.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\colonyserver_data\packages\fNbt.0.6.4\lib\net35-client\fNbt.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -74,25 +74,41 @@
     <None Update="modinfo.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="CustomConstructionArea.cs" />
-    <Compile Include="CustomConstructionAreaJobDefinition.cs" />
+    <None Include=".gitignore" />
+    <None Include="en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="modinfo.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    <None Include="npcTypes.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="science.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="texturemapping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="types.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomConstructionAreaJobDefinition.cs" />
+    <Compile Include="GhostHelper.cs" />
     <Compile Include="ImprovedConstruction.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="ReplacerSpecial.cs" />
-    <Compile Include="ReplacerSpecialLoader.cs" />
+    <Compile Include="Iterators\Circle.cs" />
+    <Compile Include="Iterators\Pyramid.cs" />
+    <Compile Include="Iterators\Walls.cs" />
+    <Compile Include="jobs\ShapeBuilderLoader.cs" />
+    <Compile Include="jobs\ReplacerSpecial.cs" />
+    <Compile Include="jobs\ReplacerSpecialLoader.cs" />
+    <Compile Include="Testing.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Advanced-Geometry.png" />
+    <Content Include="Basic-Geometry.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -17,7 +17,6 @@ namespace Improved_Construction
 	[ModLoader.ModManager]
 	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnPlayerSelectedTypePopup, IOnAssemblyLoaded
 	{
-
 		public void OnAssemblyLoaded(string path)
 		{
 			//Register loader for Construction job callback
@@ -28,9 +27,15 @@ namespace Improved_Construction
 
 			//Override identifier so we can create our own callback using the Construction Job
 			AreaJobTracker.RegisterAreaJobDefinition(new CustomConstructionAreaJobDefinition());
-			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.walls", "wingdings.walls", "wingdings.builder.2D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
-			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.pyramid", "wingdings.pyramid", "wingdings.builder.3D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
-			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.circle", "wingdings.circle", "wingdings.builder.2D", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.walls", "wingdings.walls", "wingdings.builder.2d", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.pyramid", "wingdings.pyramid", "wingdings.builder.3d", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+			CommandToolManager.AddAreaJobSettings(new ConstructionAreaToolSettings("wingdings.tooljob.circle", "wingdings.circle", "wingdings.builder.2d", EConstructionKind.Builder, 1, EAreaItemSelectionFilter.ComboBuildable));
+
+			//dictionary.Add("pipliz.digger", ("popup.tooljob.diggera", "popup.tooljob.diggerb"));
+			CommandToolManager.AddButtonTooltip("wingdings.tooljob.replacer", "wingdings.tooljob.replacera", "wingdings.tooljob.replacerb");
+			CommandToolManager.AddButtonTooltip("wingdings.tooljob.walls", "wingdings.tooljob.wallsa", "wingdings.tooljob.wallsb");
+			CommandToolManager.AddButtonTooltip("wingdings.tooljob.pyramid", "wingdings.tooljob.pyramida", "wingdings.tooljob.pyramidb");
+			CommandToolManager.AddButtonTooltip("wingdings.tooljob.circle", "wingdings.tooljob.circlea", "wingdings.tooljob.circleb");
 		}
 
 		public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)

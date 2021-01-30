@@ -19,6 +19,14 @@
       {
         "fileType": "addOrOverrideTextureMappingEntries",
         "relativePath": "texturemapping.json"
+      },
+      {
+        "fileType" : "addOrReplaceNPCTypes",
+        "relativePath" : "npcTypes.json"
+      },
+      {
+        "fileType" : "addScience",
+        "relativePath" : "science.json"
       }
     ]
   }

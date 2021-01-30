@@ -1,0 +1,32 @@
+[
+	{
+		"colonyPointRequirement": 6000,
+		"dependencies": [
+			"pipliz.baseresearch.constructionbuilder"
+		],
+		"icon": "./textures/Basic-Geometry.png",
+		"iterationCount": 0,
+		"key": "wingdings.research.2d",
+		"unlocksClientHints": [
+			{
+				"data": "wingdings.builder.2d",
+				"type": "NPCType"
+			}
+		]
+	},
+	{
+		"colonyPointRequirement": 12000,
+		"dependencies": [
+			"wingdings.research.2d"
+		],
+		"icon": "./textures/Advanced-Geometry.png",
+		"iterationCount": 0,
+		"key": "wingdings.research.3d",
+		"unlocksClientHints": [
+			{
+				"data": "wingdings.builder.3d",
+				"type": "NPCType"
+			}
+		]
+	}
+]
