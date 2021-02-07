@@ -1,9 +1,9 @@
 [
   {
     "dllpath": "ImprovedConstruction.dll",
-    "name": "ImprovedConstruction",
+    "name": "Expanded Construction",
     "version": "0.1.0.0",
-    "marksgamemodded": false,
+    "marksgamemodded": true,
     "compatibleversions": [
       "0.8.0"
     ],
@@ -19,6 +19,14 @@
       {
         "fileType": "addOrOverrideTextureMappingEntries",
         "relativePath": "texturemapping.json"
+      },
+      {
+        "fileType" : "addOrReplaceNPCTypes",
+        "relativePath" : "npcTypes.json"
+      },
+      {
+        "fileType" : "addScience",
+        "relativePath" : "science.json"
       }
     ]
   }
