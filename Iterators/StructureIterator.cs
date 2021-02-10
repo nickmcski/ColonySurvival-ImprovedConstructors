@@ -14,17 +14,19 @@ namespace ExtendedBuilder.Jobs
         protected Vector3Int iterationChunkLocation;
 
         public Vector3Int location;
+		public Structure.Rotation rotation;
 
-        public string SchematicName { get; private set; }
+
+				public string SchematicName { get; private set; }
         public Structure BuilderSchematic { get; private set; }
 
-        public StructureIterator(ConstructionArea area, string schematicName, int x, int y, int z, Structure.Rotation rotation = Structure.Rotation.Front)
+        public StructureIterator(ConstructionArea area, string schematicName, Structure.Rotation rotation = Structure.Rotation.Front)
         {
             this.area = area;
 
             positionMin = area.Minimum;
             positionMax = area.Maximum;
-            this.location = new Vector3Int(x,y,z);
+			      this.location = area.Minimum;
 
             iterationChunkLocation = positionMin;
             cursor = positionMin;
@@ -40,7 +42,7 @@ namespace ExtendedBuilder.Jobs
 
                 return;
             }
-
+			this.rotation = rotation;
             BuilderSchematic.Rotate(rotation);
         }
 

@@ -18,12 +18,9 @@ namespace ExtendedBuilder.Jobs
                 return;
 
            if (node.TryGetAs(NAME + ".StructureName", out string schematic) 
-                && node.TryGetAs(NAME + ".LocationX", out int locationx)
-                && node.TryGetAs(NAME + ".LocationY", out int locationY)
-                && node.TryGetAs(NAME + ".LocationZ", out int locationZ)
                 && node.TryGetAs(NAME + ".Rotation", out Structure.Rotation rotation))
             {
-                area.IterationType = new StructureIterator(area, schematic, locationx, locationY, locationZ, rotation);
+                area.IterationType = new StructureIterator(area, schematic, rotation);
                 area.ConstructionType = new StructureBuilder();
             }
         }
@@ -35,8 +32,9 @@ namespace ExtendedBuilder.Jobs
             if (itt != null)
             {
                 node.SetAs(NAME + ".StructureName", itt.SchematicName);
+								node.SetAs(NAME + ".Rotation", itt.rotation);
 
-                node.SetAs(NAME + ".LocationX", itt.location.x);
+								node.SetAs(NAME + ".LocationX", itt.location.x);
                 node.SetAs(NAME + ".LocationY", itt.location.y);
                 node.SetAs(NAME + ".LocationZ", itt.location.z);
 

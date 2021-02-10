@@ -22,6 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,6 +76,7 @@
     <None Update="modinfo.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include=".editorconfig" />
     <None Include=".gitignore" />
     <None Include="en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -95,20 +98,37 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConstructionPlacer.cs" />
     <Compile Include="CustomConstructionAreaJobDefinition.cs" />
     <Compile Include="GhostHelper.cs" />
     <Compile Include="ImprovedConstruction.cs" />
     <Compile Include="Iterators\Circle.cs" />
     <Compile Include="Iterators\Pyramid.cs" />
+    <Compile Include="Iterators\StructureIterator.cs" />
     <Compile Include="Iterators\Walls.cs" />
+    <Compile Include="jobs\SchematicTool.cs" />
     <Compile Include="jobs\ShapeBuilderLoader.cs" />
     <Compile Include="jobs\ReplacerSpecial.cs" />
     <Compile Include="jobs\ReplacerSpecialLoader.cs" />
+    <Compile Include="jobs\StructureBuilder.cs" />
+    <Compile Include="jobs\StructureBuilderLoader.cs" />
+    <Compile Include="persitence\blueprint\Blueprint.cs" />
+    <Compile Include="persitence\schematic\Block.cs" />
+    <Compile Include="persitence\schematic\BlockMapping.cs" />
+    <Compile Include="persitence\schematic\RawSchematic.cs" />
+    <Compile Include="persitence\schematic\Schematic.cs" />
+    <Compile Include="persitence\schematic\TileEntity.cs" />
+    <Compile Include="persitence\Structure.cs" />
+    <Compile Include="persitence\StructureManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectedArea.cs" />
     <Compile Include="Testing.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Advanced-Geometry.png" />
     <Content Include="Basic-Geometry.png" />
+    <Content Include="textures\Advanced-Geometry.png" />
+    <Content Include="textures\Basic-Geometry.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
