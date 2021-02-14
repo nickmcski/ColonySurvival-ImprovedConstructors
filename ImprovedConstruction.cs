@@ -117,7 +117,7 @@ namespace Improved_Construction
 						OneAreaOnly = true,
 						Key = "wingdings.customconstruction",
 						NPCTypeKey = "pipliz.digger",
-						TranslationKey = "Wingdings.customconstruction"
+						TranslationKey = "wingdings.tooljob.replacer"
 					};
 					CommandToolManager.StartCommandToolSelection(player, data);
 					break;
