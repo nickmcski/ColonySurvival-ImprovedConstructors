@@ -1,9 +1,14 @@
 {
 	"ghost": {
+		"colliders" : {
+			"boxes" : [{"max":[0.4,0.4,0.4],"min":[-0.4,-0.4,-0.4]}],
+			"collidePlayer" : false
+		},
 		"categories": [
 			"decorative"
 		],
 		"icon": "./textures/glass.png",
+		"mesh" : "./meshes/ghost.obj",
 		"isSolid": false,
 		"sideall": "SELF",
 		"lightingTransparency": 255

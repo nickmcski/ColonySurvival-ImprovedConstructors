@@ -2,12 +2,14 @@
 using ExtendedBuilder.Jobs;
 using ExtendedBuilder.Persistence;
 using Jobs;
+using Jobs.Implementations.Construction;
 using ModLoaderInterfaces;
 using NetworkUI;
 using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
 using Pipliz.JSON;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,7 @@ namespace Improved_Construction
 {
 	[ModLoader.ModManager]
 	[ChatCommandAutoLoader]
-	class ConstructionPlacer : IChatCommand, IOnPlayerPushedNetworkUIButton, IOnSendAreaHighlights
+	class ConstructionPlacer : IChatCommand, IOnPlayerPushedNetworkUIButton, IOnSendAreaHighlights, IOnConstructTooltipUI
 	{
 		public static void SendSelectionMenu(Players.Player player)
 		{
@@ -33,31 +35,30 @@ namespace Improved_Construction
 			table.ExternalMarginHorizontal = 3f;
 
 			List<(IItem, int)> header = new List<(IItem, int)>();
-			header.Add((new Label("Test1"), 100));
-			header.Add((new Label("Test2"), 100));
+			header.Add((new Label("Structure Name"), 100));
+			header.Add((new Label("Size"), 100));
 			HorizontalRow headerRow = new HorizontalRow(header, -1, 0.0f, 0.0f, 4f);
 			table.Header = headerRow;
 			table.Rows = new List<IItem>();
 
-			foreach (KeyValuePair<string,string> structure in StructureManager._structures)
+			foreach (KeyValuePair<string,Structure> structure in StructureManager._structures)
 			{
 				List<(IItem, int)> row = new List<(IItem, int)>();
-				row.Add((new Label("Test1"), 100));
-				row.Add((new Label(structure.Key), 100));
+				row.Add((new Label(structure.Key), 200));
+				row.Add((new Label(structure.Value.GetSizeString()), 100));
 				row.Add((GetButtonItem(structure.Key), 100));
 				HorizontalRow horizontalRow = new HorizontalRow(row, 30);
 				table.Rows.Add(new BackgroundColor(horizontalRow, -1, 20, 0.0f, 0.0f, 4f, 4f, Table.ITEM_BG_COLOR));
 			}
 
 			menu.Items.Add(table);
-			
 			NetworkMenuManager.SendServerPopup(player, menu);
 		}
 
 		public static IItem GetButtonItem(string structureName)
 		{
 			//TODO Check to see player has unlocked this size structure
-			LabelData text = new LabelData(structureName, ELabelAlignment.Default, 16, LabelData.ELocalizationType.None);
+			LabelData text = new LabelData("Select", ELabelAlignment.Default, 16, LabelData.ELocalizationType.None);
 			JToken ButtonPayload = new JObject()
 			{
 				{
@@ -65,13 +66,13 @@ namespace Improved_Construction
 					(JToken) structureName
 				}
 			};
-			return (IItem)new ButtonCallback("wingdings.construction.structure", text, 110, 30, ButtonCallback.EOnClickActions.DisableAllInteractive, ButtonPayload, 0.0f, 0.0f, true);
+			return (IItem)new ButtonCallback("wingdings.construction.structure", text, 110, 30, ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload, 0.0f, 0.0f, true)
+			{
+				TriggerHoverCallback = true
+		  };
 		}
 			public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
 		{
-			
-			if (splits.Count < 1 || (splits[0] != "/load" && splits[0] != "/apply"))
-				return false;
 			switch (splits[0])
 			{
 				case "/load":
@@ -79,6 +80,12 @@ namespace Improved_Construction
 					return true;
 				case "/apply":
 					Apply(player);
+					return true;
+				case "/show":
+					Show(player);
+					return true;
+				case "/chunk":
+					ClearChunk(player);
 					return true;
 			}
 			return false;
@@ -173,6 +180,59 @@ namespace Improved_Construction
 
 			AreaJobTracker.SendData(player);
 
+		}
+
+		public void Show(Player player)
+		{
+			if (player == null)
+				return;
+			int foundIndex;
+			if (!selectionTracker.Contains(player, out foundIndex))
+			{
+				Chat.Send(player, "You don't have valid selection");
+				return;
+			}
+			SelectedArea selected = selectionTracker.GetValueAtIndex(foundIndex);
+
+			JSONNode args = selected.args;
+			args.SetAs("constructionType", StructureBuilderLoader.NAME);
+
+			//args.SetAs(StructureBuilderLoader.NAME + ".LocationX", location.x);
+			//args.SetAs(StructureBuilderLoader.NAME + ".LocationY", location.y);
+			//args.SetAs(StructureBuilderLoader.NAME + ".LocationZ", location.z);
+			ConstructionArea area = new ConstructionArea(null, null, selected.corner1, selected.corner2);
+			area.SetArgument(args);
+			string structureName;
+			if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
+			{
+				Log.WriteError("Could not get structure!");
+				return;
+			}
+			Structure.Rotation rotation;
+			if (!args.TryGetAs<Structure.Rotation>(StructureBuilderLoader.NAME + ".Rotation", out rotation))
+			{
+				Log.WriteError("Could not get rotation!");
+				return;
+			}
+
+			StructureIterator iterator = new StructureIterator(area, structureName, rotation);
+			GhostHelper.FillGhost(iterator);
+		}
+
+		public void OnConstructTooltipUI(Player player, ConstructTooltipUIData data)
+		{
+			if (data.hoverType != ETooltipHoverType.NetworkUiButton)
+				return;
+
+			Log.Write(data.hoverKey);
+		}
+
+		public void ClearChunk(Player player)
+		{
+			Chunk chunk = World.GetChunk(player.VoxelPosition.ToChunk());
+
+			chunk.SendToReceivingPlayers(player);
+			return;
 		}
 
 		//Load model size

@@ -17,7 +17,7 @@ namespace ExtendedBuilder.Persistence
         /// <summary>Contains TileEntities such as hoppers and chests</summary>
         public Vector3Int StartPos { get; set; }
 
-        public Schematic(Structure structure)
+        public Schematic(Structure structure) : base(structure)
         {
             Name = "";
             if (structure is Blueprint)
@@ -90,6 +90,7 @@ namespace ExtendedBuilder.Persistence
                 }
             }
         }
+
 
         public Schematic(string file) : base(file)
         {

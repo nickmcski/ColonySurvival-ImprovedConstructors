@@ -69,7 +69,7 @@ namespace ExtendedBuilder.Persistence
             return blocks[x, y, z];
         }
 
-        public Blueprint(Structure structure)
+        public Blueprint(Structure structure) : base(structure)
         {
             xSize = structure.GetMaxX();
             ySize = structure.GetMaxY();

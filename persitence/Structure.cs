@@ -12,11 +12,13 @@ namespace ExtendedBuilder.Persistence
             Left
         }
 
-        protected Structure() { }
+        protected Structure(Structure structure) { }
 
         protected Structure(string file) { }
 
-        public abstract int GetMaxX();
+		protected Structure() { }
+
+		public abstract int GetMaxX();
         public abstract int GetMaxY();
         public abstract int GetMaxZ();
 
@@ -49,5 +51,10 @@ namespace ExtendedBuilder.Persistence
         }
 
         public abstract void Save(string name);
+
+		public string GetSizeString()
+		{
+			return GetMaxX() + " x " + GetMaxY() + " x " + GetMaxZ();
+		}
     }
 }

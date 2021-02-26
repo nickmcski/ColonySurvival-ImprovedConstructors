@@ -13,7 +13,7 @@ namespace ExtendedBuilder.Persistence
         public static string Blueprint_FOLDER = "";
         public static string Schematic_FOLDER = "";
 
-        public static Dictionary<string, string> _structures = new Dictionary<string, string>();
+        public static Dictionary<string, Structure> _structures = new Dictionary<string, Structure>();
 
         public void OnAssemblyLoaded(string path)
         {
@@ -41,8 +41,8 @@ namespace ExtendedBuilder.Persistence
                 {
                     string blueprint_name = file.Substring(file.LastIndexOf("/") + 1).Trim().ToLower();
                     blueprint_name = blueprint_name.Substring(0, blueprint_name.Length - 2);
-
-                    _structures.Add(blueprint_name, file);
+					Structure structure = new Blueprint(file);
+                    _structures.Add(blueprint_name, structure);
                     Log.Write(string.Format("<color=blue>Loaded blueprint: {0}</color>", blueprint_name));
                 }
 
@@ -65,7 +65,8 @@ namespace ExtendedBuilder.Persistence
                         Log.Write(string.Format("<color=red>The {0} schematic has not been added since a blueprint with the same name already exists.</color>", schematic_name));
                         continue;
                     }
-                    _structures.Add(schematic_name, file);
+					Structure structure = new Schematic(file);
+					_structures.Add(schematic_name, structure);
 
                     Log.Write(string.Format("<color=blue>Loaded blueprint: {0}</color>", schematic_name));
                 }
@@ -76,19 +77,12 @@ namespace ExtendedBuilder.Persistence
 
         public static Structure GetStructure(string name)
         {
-            string file = "";
+            Structure structure = null;
 
-            if (!_structures.TryGetValue(name, out file))
-                file = "";
+						if (!_structures.TryGetValue(name, out structure))
+							return null;
 
-            if (file.Equals(""))
-                return null;
-
-            if (file.Contains(".csschematic"))
-                return new Schematic(file);
-
-            return new Blueprint(file);
-            
+			return structure;
         }
 
         public static bool SaveStructure(Structure structure, string name)
