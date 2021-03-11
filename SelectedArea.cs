@@ -1,4 +1,5 @@
-﻿using ExtendedBuilder.Persistence;
+﻿using ExtendedBuilder.Jobs;
+using ExtendedBuilder.Persistence;
 using Pipliz;
 using Pipliz.JSON;
 using System;
@@ -11,7 +12,7 @@ using Math = Pipliz.Math;
 
 namespace Improved_Construction
 {
-	class SelectedArea
+	public class SelectedArea
 	{
 		public SelectedArea()
 		{
@@ -41,13 +42,17 @@ namespace Improved_Construction
 		public void SetCorner1(Vector3Int newPos)
 		{
 			pos1 = newPos;
-			corner1 = Vector3Int.Min(pos1, pos2);
-			corner2 = Vector3Int.Max(pos1, pos2);
+			UpdateCorner();
 		}
 
 		public void SetCorner2(Vector3Int newPos)
 		{
 			pos2 = newPos;
+			UpdateCorner();
+		}
+
+		public void UpdateCorner()
+		{
 			corner1 = Vector3Int.Min(pos1, pos2);
 			corner2 = Vector3Int.Max(pos1, pos2);
 		}
@@ -57,9 +62,28 @@ namespace Improved_Construction
 		public int GetZSize() { return Math.Abs(pos1.z - pos2.z) + 1; }
 		public int GetSize() { return GetXSize() * GetYSize() * GetZSize(); }
 
+		public void Rotate()
+		{
+			if (args == null)
+				return;
+			Structure.Rotation rotation;
+			args.TryGetAs(StructureBuilderLoader.NAME + ".Rotation", out rotation);
+			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", Structure.RotateClockwise(rotation));
+
+			//TODO Shift corners around centerpoint
+		}
+
 		public AreaHighlight GetAreaHighlight()
 		{
 			return new AreaHighlight(corner1, corner2, Shared.EAreaMeshType.AutoSelectActive, Shared.EServerAreaType.Default);
+		}
+
+		public void Move(Vector3Int offset)
+		{
+			//TODO
+			pos1 += offset;
+			pos2 += offset;
+			UpdateCorner();
 		}
 	}
 }

@@ -9,27 +9,8 @@ namespace Improved_Construction
 {
 	static class GhostHelper
 	{
-		public static void FillGhost(ConstructionArea area, IIterationType iteration)
-		{
-			ItemType ghostBlock = ItemTypes.GetType("ghost");
-
-			int num1 = 4096;
-			while (num1-- > 0)
-			{
-				Vector3Int currentPosition = iteration.CurrentPosition;
-				ushort val;
-				if (World.TryGetTypeAt(currentPosition, out val))
-				{
-					if (val == (ushort)0 || (int)val == (int)BuiltinBlocks.Indices.water)
-					{
-						SendGhostBlock(area.Owner, currentPosition, ghostBlock);
-					}
-				}
-				iteration.MoveNext();
-			}
-		}
-
 		private static int MAX_GHOST_BLOCKS = 1000;
+
 		public static void FillGhost(StructureIterator bpi)
 		{
 			int blocks = 0;

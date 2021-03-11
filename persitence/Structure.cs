@@ -12,6 +12,11 @@ namespace ExtendedBuilder.Persistence
             Left
         }
 
+		public static Rotation RotateClockwise(Rotation rotation)
+		{
+			return ((rotation + 1) & Rotation.Left); //Rotate clockwise, bitwise with 3
+		}
+
         protected Structure(Structure structure) { }
 
         protected Structure(string file) { }

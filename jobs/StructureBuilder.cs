@@ -27,7 +27,7 @@ namespace ExtendedBuilder.Jobs
             }
         }
 
-        public int OnStockpileNewItemCount => 1;
+        public int OnStockpileNewItemCount => 5;
 
         public void DoJob(IIterationType iterationType, IAreaJob areaJob, ConstructionJobInstance job, ref NPCBase.NPCState state)
         {

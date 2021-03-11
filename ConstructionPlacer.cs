@@ -1,6 +1,7 @@
 ﻿using Chatting;
 using ExtendedBuilder.Jobs;
 using ExtendedBuilder.Persistence;
+using Improved_Construction.motion;
 using Jobs;
 using Jobs.Implementations.Construction;
 using ModLoaderInterfaces;
@@ -9,6 +10,7 @@ using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
 using Pipliz.JSON;
+using Science;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -21,21 +23,21 @@ namespace Improved_Construction
 {
 	[ModLoader.ModManager]
 	[ChatCommandAutoLoader]
-	class ConstructionPlacer : IChatCommand, IOnPlayerPushedNetworkUIButton, IOnSendAreaHighlights, IOnConstructTooltipUI
+	public class ConstructionPlacer : IChatCommand, IOnPlayerPushedNetworkUIButton, IOnSendAreaHighlights, IOnConstructTooltipUI, IOnConstructCommandTool
 	{
 		public static void SendSelectionMenu(Players.Player player)
 		{
 			NetworkMenu menu = new NetworkMenu();
-			menu.LocalStorage.SetAs<string>("header", "Pick Menu");
-			menu.Width = 600;
+			menu.LocalStorage.SetAs<string>("header", "Structures");
+			menu.Width = 600; //TODO Tweak size
 			menu.Height = 300;
 
 			Table table = new Table(900, 300);
-			table.AutoExpandHeight = false;
+			table.AutoExpandHeight = true;
 			table.ExternalMarginHorizontal = 3f;
 
 			List<(IItem, int)> header = new List<(IItem, int)>();
-			header.Add((new Label("Structure Name"), 100));
+			header.Add((new Label("Structure Name"), 200));
 			header.Add((new Label("Size"), 100));
 			HorizontalRow headerRow = new HorizontalRow(header, -1, 0.0f, 0.0f, 4f);
 			table.Header = headerRow;
@@ -105,42 +107,46 @@ namespace Improved_Construction
 				return;
 			}
 			Vector3Int location = new Vector3Int(data.Player.Position);
+			location.x -= structure.GetMaxX() / 2;
+
 			Vector3Int maxSize;
 
 			maxSize = location.Add(structure.GetMaxX(), structure.GetMaxY(), structure.GetMaxZ());
-
 
 			JSONNode args = new JSONNode();
 			args.SetAs("constructionType", StructureBuilderLoader.NAME);
 
 			args.SetAs(StructureBuilderLoader.NAME + ".StructureName", structureName);
-			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", Structure.Rotation.Front);
-			
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationX", location.x);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationY", location.y);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationZ", location.z);
+			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", Structure.Rotation.Front); //TODO Take player facing direction??
 
-			//AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, data.Player.ActiveColony, location, maxSize);
-			//AreaJobTracker.SendData(data.Player);
-			setSelection(data.Player, location, maxSize, args);
+			SelectedArea selection = setSelection(data.Player, location, maxSize, args);
+			Show(data.Player);
+
+			//TODO Move player accordingly
+			location.x += structure.GetMaxX() / 2;
+			location.z -= 2;
+			Dozer.CreateDozerPlacer(data.Player, location.Vector, UnityEngine.Quaternion.Euler(0,-90,0), selection, this);
 		}
 
 		public static Pipliz.Collections.SortedList<Player, SelectedArea> selectionTracker = new Pipliz.Collections.SortedList<Player, SelectedArea>();
 
-		public static void setSelection(Player player, Vector3Int loc1, Vector3Int loc2, JSONNode args = null)
+		public static SelectedArea setSelection(Player player, Vector3Int loc1, Vector3Int loc2, JSONNode args = null)
 		{
 			int foundIndex;
+			SelectedArea selected;
 			if( selectionTracker.Contains(player, out foundIndex))
 			{
-				ref SelectedArea selected = ref selectionTracker.GetValueAtIndexRef(foundIndex);
+				selected = selectionTracker.GetValueAtIndexRef(foundIndex);
 				selected.SetCorner1(loc1);
 				selected.SetCorner2(loc2);
 			}
 			else
 			{
-				selectionTracker.Add(player, new SelectedArea(loc1, loc2, args));
+				selected = new SelectedArea(loc1, loc2, args);
+				selectionTracker.Add(player, selected);
 			}
 			AreaJobTracker.SendData(player);
+			return selected;
 		}
 
 		public void OnSendAreaHighlights(Player player, List<AreaJobTracker.AreaHighlight> highlights, List<ushort> showWhileHoldingTypes)
@@ -197,9 +203,6 @@ namespace Improved_Construction
 			JSONNode args = selected.args;
 			args.SetAs("constructionType", StructureBuilderLoader.NAME);
 
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationX", location.x);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationY", location.y);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationZ", location.z);
 			ConstructionArea area = new ConstructionArea(null, null, selected.corner1, selected.corner2);
 			area.SetArgument(args);
 			string structureName;
@@ -235,14 +238,24 @@ namespace Improved_Construction
 			return;
 		}
 
-		//Load model size
-		//Attach Mesh
-		//Hook movement keys
-		//Update position
-		//Send new grid
-		//Send new ghost
+		public void OnConstructCommandTool(Player p, NetworkMenu menu, string menuName)
+		{
+			if (menuName != "popup.tooljob.construction")
+				return;
+			menu.Items.Add((IItem)new EmptySpace(20));
 
-		//Apply, trigger OnSelectionMade
+			List<(IItem, int)> Items = new List<(IItem, int)>();
+			Items.Add(((IItem)new Label(new LabelData("", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), -1, 0.0f, 0.0f)
+			{
+				Width = 80
+			}, 80));
 
+			bool unlocked = CommandToolManager.NPCAreaUnlocked(p, "pipliz.builder", out ScienceKey? _);
+			ButtonCallback button = new ButtonCallback("wingdings.blueprints", new LabelData("wingdings.tooljob.structure", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 200, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
+			{
+				Enabled = unlocked
+			};
+			Items.Add((button, 410));
+		}
 	}
 }
