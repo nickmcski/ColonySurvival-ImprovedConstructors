@@ -4,6 +4,7 @@ using ExtendedBuilder.Persistence;
 using Improved_Construction.motion;
 using Jobs;
 using Jobs.Implementations.Construction;
+using MeshedObjects;
 using ModLoaderInterfaces;
 using NetworkUI;
 using NetworkUI.Items;
@@ -95,6 +96,12 @@ namespace Improved_Construction
 
 		public void OnPlayerPushedNetworkUIButton(ButtonPressCallbackData data)
 		{
+			if(data.ButtonIdentifier == "wingdings.blueprints")
+			{
+				SendSelectionMenu(data.Player);
+				return;
+			}
+
 			if (!(data.ButtonIdentifier == "wingdings.construction.structure"))
 				return;
 			string structureName = data.ButtonPayload["key"].Value<string>();
@@ -126,6 +133,8 @@ namespace Improved_Construction
 			location.x += structure.GetMaxX() / 2;
 			location.z -= 2;
 			Dozer.CreateDozerPlacer(data.Player, location.Vector, UnityEngine.Quaternion.Euler(0,-90,0), selection, this);
+
+			Chat.Send(data.Player, "Blueprint loaded! Type <b>/apply</b> once it's in the right place");
 		}
 
 		public static Pipliz.Collections.SortedList<Player, SelectedArea> selectionTracker = new Pipliz.Collections.SortedList<Player, SelectedArea>();
@@ -186,6 +195,13 @@ namespace Improved_Construction
 
 			AreaJobTracker.SendData(player);
 
+			MeshedVehicleDescription vehicle;
+			if(MeshedObjectManager.TryGetVehicle(player, out vehicle))
+			{
+					MeshedObjectManager.Detach(player);
+					vehicle.Object.SendRemoval(UnityEngine.Vector3Int.zero);
+			}
+
 		}
 
 		public void Show(Player player)
@@ -230,10 +246,39 @@ namespace Improved_Construction
 			Log.Write(data.hoverKey);
 		}
 
-		public void ClearChunk(Player player)
+		public static void ClearChunk(Vector3Int blockMin, Vector3Int blockMax, Player p)
 		{
-			Chunk chunk = World.GetChunk(player.VoxelPosition.ToChunk());
+			Vector3Int chunkMin = blockMin.ToChunk();
+			Vector3Int chunkMax = blockMax.ToChunk();
 
+			Log.Write("Chunk Min: " + chunkMin + " Chunk Max: " + chunkMax);
+			for (int x = chunkMin.x; x <= chunkMax.x; x += 16)
+			{
+				for (int y = chunkMin.y; y <= chunkMax.y; y += 16)
+				{
+					for (int z = chunkMin.z; z <= chunkMax.z; z += 16)
+					{
+						Vector3Int ChunkPos = new Vector3Int(x, y, z);
+						Chunk chunk = World.GetChunk(ChunkPos);
+						chunk.SendToReceivingPlayers(p);
+						Log.Write("Sending chunks to players!");
+					}
+				}
+			}
+		}
+
+		public static void ClearChunk(Player player)
+		{
+			SelectedArea selection;
+			if(selectionTracker.TryGetValue(player, out selection))
+			{
+				ClearChunk(selection.corner1, selection.corner2, player);
+				Chat.Send(player, "Resent Chunks");
+				return;
+			}
+
+			//Fallback to clear current position
+			Chunk chunk = World.GetChunk(player.VoxelPosition.ToChunk());
 			chunk.SendToReceivingPlayers(player);
 			return;
 		}
@@ -251,11 +296,14 @@ namespace Improved_Construction
 			}, 80));
 
 			bool unlocked = CommandToolManager.NPCAreaUnlocked(p, "pipliz.builder", out ScienceKey? _);
-			ButtonCallback button = new ButtonCallback("wingdings.blueprints", new LabelData("wingdings.tooljob.structure", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 200, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
+			ButtonCallback button = new ButtonCallback("wingdings.blueprints", new LabelData("wingdings.tooljob.structure", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 410, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
 			{
 				Enabled = unlocked
 			};
 			Items.Add((button, 410));
+
+			HorizontalRow horizontalRow = new HorizontalRow(Items, 45);
+			menu.Items.Add((IItem)horizontalRow);
 		}
 	}
 }

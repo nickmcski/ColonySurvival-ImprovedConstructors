@@ -50,7 +50,7 @@ namespace Improved_Construction
 				data.Write(ClientMessageType.BlockChange);
 				data.WriteVariable(position);
 				data.WriteVariable(type.ItemIndex);
-				Players.SendToNearbyDrawDistance(position, data, 2000, NetworkMessageReliability.ReliableWithBuffering);
+				Players.SendToNearbyDrawDistance(position, data, 200, NetworkMessageReliability.Unreliable);
 			}
 			Log.Write("Sending ghost block!" + position.ToString());
 		}

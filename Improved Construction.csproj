@@ -63,6 +63,9 @@
       <HintPath>Q:\GAMES\Steam\steamapps\common\Colony Survival\colonyserver_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>Q:\GAMES\Steam\steamapps\common\Colony Survival\colonyserver_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>Q:\GAMES\Steam\steamapps\common\Colony Survival\colonyserver_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
@@ -80,6 +83,9 @@
     <None Include=".gitignore" />
     <None Include="en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="meshes\Dozer.ply">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="meshes\ghost.mtl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -121,6 +127,9 @@
     <Compile Include="jobs\ReplacerSpecialLoader.cs" />
     <Compile Include="jobs\StructureBuilder.cs" />
     <Compile Include="jobs\StructureBuilderLoader.cs" />
+    <Compile Include="motion\Dozer.cs" />
+    <Compile Include="motion\DozerMover.cs" />
+    <Compile Include="motion\DozerTransport.cs" />
     <Compile Include="persitence\blueprint\Blueprint.cs" />
     <Compile Include="persitence\schematic\Block.cs" />
     <Compile Include="persitence\schematic\BlockMapping.cs" />
@@ -134,8 +143,6 @@
     <Compile Include="Testing.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Advanced-Geometry.png" />
-    <Content Include="Basic-Geometry.png" />
     <Content Include="textures\Advanced-Geometry.png" />
     <Content Include="textures\Basic-Geometry.png" />
     <Content Include="textures\ghost.png">

@@ -14,7 +14,8 @@
         "pyramidb": "Select the material you want to use, then select the area to build.",
         "circle": "Circle",
         "circlea": "Builds a verticle cylinder",
-        "circleb": "Select the material you want to use, then the area your circle should be built"
+        "circleb": "Select the material you want to use, then the area your circle should be built",
+        "structure": "Blueprints"
       },
       "research": {
         "2d": {

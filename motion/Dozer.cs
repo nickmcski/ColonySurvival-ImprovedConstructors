@@ -23,29 +23,10 @@ namespace Improved_Construction.motion
 				{
 					new TransportManager.Box()
 					{
-						Size = new Vector3(0.56f, 0.205f, 1.115f),
-						Offset = new Vector3(0.0f, -0.645f, -0.145f),
+						Size = new Vector3(1.115f, 0.56f, 1.115f),
+						Offset = new Vector3(0.0f, -0.56f, -0.145f),
 						EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
 
-					},
-					new TransportManager.Box()
-					{
-						Size = new Vector3(1.1f, 0.205f, 3.46f),
-						Offset = new Vector3(0.0f, 1.83f, -1.85f),
-						EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
-
-					},
-					new TransportManager.Box()
-					{
-						Size = new Vector3(9.05f, 0.205f, 0.75f),
-						Offset = new Vector3(0.0f, 1.83f, 0.25f),
-						EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
-					},
-					new TransportManager.Box()
-					{
-						Size = new Vector3(6.68f, 0.205f, 0.75f),
-						Offset = new Vector3(0.0f, 1.83f, 1f),
-						EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
 					}
 				};
 
