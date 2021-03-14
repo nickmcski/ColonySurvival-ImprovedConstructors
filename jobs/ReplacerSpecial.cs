@@ -38,10 +38,10 @@ namespace Improved_Construction
 
 
 		public void DoJob(
-			IIterationType iterationType,
-			IAreaJob areaJob,
-			ConstructionJobInstance job,
-			ref NPCBase.NPCState state)
+				IIterationType iterationType,
+				IAreaJob areaJob,
+				ConstructionJobInstance job,
+				ref NPCBase.NPCState state)
 		{
 			if (iterationType == null)
 			{

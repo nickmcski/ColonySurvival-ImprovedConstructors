@@ -12,7 +12,7 @@ namespace Improved_Construction.motion
 	{
 		private static System.Type[] RigidBodyList = new System.Type[1]
 {
-				typeof (Rigidbody)
+								typeof (Rigidbody)
 };
 
 		public Transform CoreTransform;
@@ -24,8 +24,8 @@ namespace Improved_Construction.motion
 		private DozerTransport ParentTransport;
 
 		public DozerMover(Vector3 startPosition,
-				Quaternion startRotation,
-				Players.Player playerInside)
+						Quaternion startRotation,
+						Players.Player playerInside)
 		{
 			this.LastInputPlayer = playerInside;
 			if ((UnityEngine.Object)TransportManager.TransportRootTransform == (UnityEngine.Object)null)
@@ -72,9 +72,9 @@ namespace Improved_Construction.motion
 		}
 
 		public void ProcessInputs(
-			Players.Player player,
-			Pipliz.Collections.SortedList<EInputKey, float> keyTimes,
-			float deltaTime)
+				Players.Player player,
+				Pipliz.Collections.SortedList<EInputKey, float> keyTimes,
+				float deltaTime)
 		{
 			Log.Write("GOT INPUTS!!!!!!");
 			this.LastInputs.Clear();
@@ -92,12 +92,15 @@ namespace Improved_Construction.motion
 
 		public TransportManager.ETransportUpdateResult UpdateTransport()
 		{
-			if ((UnityEngine.Object)this.CoreTransform == (UnityEngine.Object)null) {
+			if ((UnityEngine.Object)this.CoreTransform == (UnityEngine.Object)null)
+			{
 				Log.WriteWarning("ERROR! Dozer Mover is NULL!");
 				return TransportManager.ETransportUpdateResult.Remove;
-			} else {
+			}
+			else
+			{
 				return TransportManager.ETransportUpdateResult.KeepUpdating;
-			}	
+			}
 		}
 	}
 }

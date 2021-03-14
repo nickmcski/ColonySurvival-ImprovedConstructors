@@ -41,7 +41,7 @@ namespace Improved_Construction
 			table.Header = headerRow;
 			table.Rows = new List<IItem>();
 
-			foreach (KeyValuePair<string,Structure> structure in StructureManager._structures)
+			foreach (KeyValuePair<string, Structure> structure in StructureManager._structures)
 			{
 				List<(IItem, int)> row = new List<(IItem, int)>();
 				row.Add((new Label(structure.Key), 200));
@@ -60,19 +60,19 @@ namespace Improved_Construction
 			//TODO Check to see player has unlocked this size structure
 			LabelData text = new LabelData("Select", ELabelAlignment.Default, 16, LabelData.ELocalizationType.None);
 			JToken ButtonPayload = new JObject()
-			{
-				{
-					"key",
-					(JToken) structureName
-				}
-			};
+						{
+								{
+										"key",
+										(JToken) structureName
+								}
+						};
 			return (IItem)new ButtonCallback("wingdings.construction.structure", text, 110, 30, ButtonCallback.EOnClickActions.ClosePopup, ButtonPayload, 0.0f, 0.0f, true)
 			{
 				TriggerHoverCallback = true
-		  };
+			};
 		}
 
-			public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
+		public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
 		{
 			switch (splits[0])
 			{
@@ -97,7 +97,7 @@ namespace Improved_Construction
 
 		public void OnPlayerPushedNetworkUIButton(ButtonPressCallbackData data)
 		{
-			if(data.ButtonIdentifier == "wingdings.blueprints")
+			if (data.ButtonIdentifier == "wingdings.blueprints")
 			{
 				SendSelectionMenu(data.Player);
 				return;
@@ -133,7 +133,7 @@ namespace Improved_Construction
 			//TODO Move player accordingly
 			location.x += structure.GetMaxX() / 2;
 			location.z -= 2;
-			Dozer.CreateDozerPlacer(data.Player, location.Vector, UnityEngine.Quaternion.Euler(0,-90,0), selection, this);
+			Dozer.CreateDozerPlacer(data.Player, location.Vector, UnityEngine.Quaternion.Euler(0, -90, 0), selection, this);
 
 			Chat.Send(data.Player, "Blueprint loaded! Type <b>/apply</b> once it's in the right place");
 		}
@@ -144,7 +144,7 @@ namespace Improved_Construction
 		{
 			int foundIndex;
 			SelectedArea selected;
-			if( selectionTracker.Contains(player, out foundIndex))
+			if (selectionTracker.Contains(player, out foundIndex))
 			{
 				selected = selectionTracker.GetValueAtIndexRef(foundIndex);
 				selected.SetCorner1(loc1);
@@ -181,20 +181,16 @@ namespace Improved_Construction
 			JSONNode args = selected.args;
 			args.SetAs("constructionType", StructureBuilderLoader.NAME);
 
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationX", location.x);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationY", location.y);
-			//args.SetAs(StructureBuilderLoader.NAME + ".LocationZ", location.z);
-
 			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.cornerMin, selected.cornerMax);
 			selectionTracker.Remove(player);
 
 			AreaJobTracker.SendData(player);
 
 			MeshedVehicleDescription vehicle;
-			if(MeshedObjectManager.TryGetVehicle(player, out vehicle))
+			if (MeshedObjectManager.TryGetVehicle(player, out vehicle))
 			{
-					MeshedObjectManager.Detach(player);
-					vehicle.Object.SendRemoval(UnityEngine.Vector3Int.zero);
+				MeshedObjectManager.Detach(player);
+				vehicle.Object.SendRemoval(UnityEngine.Vector3Int.zero);
 			}
 
 		}
@@ -242,7 +238,7 @@ namespace Improved_Construction
 				Log.WriteError("Could not get structure!");
 				return;
 			}
-			GhostHelper.FillGhost((StructureIterator) area.IterationType);
+			GhostHelper.FillGhost((StructureIterator)area.IterationType);
 		}
 
 		public void OnConstructTooltipUI(Player player, ConstructTooltipUIData data)
@@ -277,7 +273,7 @@ namespace Improved_Construction
 		public static void ClearChunk(Player player)
 		{
 			SelectedArea selection;
-			if(selectionTracker.TryGetValue(player, out selection))
+			if (selectionTracker.TryGetValue(player, out selection))
 			{
 
 				SelectedArea selected = GetSelected(player);

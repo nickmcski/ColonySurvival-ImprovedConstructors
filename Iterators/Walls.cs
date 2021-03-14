@@ -34,8 +34,8 @@ namespace Improved_Construction
 		public bool IsInBounds(Vector3Int location)
 		{
 			return (location.y >= this.positionMin.y && location.y <= this.positionMax.y) &&
-					(((location.x == this.positionMin.x || location.x == this.positionMax.x) && location.z >= this.positionMin.z && location.z <= this.positionMax.z) ||
-					 ((location.z == this.positionMin.z || location.z == this.positionMax.z) && location.x >= this.positionMin.x && location.x <= this.positionMax.x));
+							(((location.x == this.positionMin.x || location.x == this.positionMax.x) && location.z >= this.positionMin.z && location.z <= this.positionMax.z) ||
+							 ((location.z == this.positionMin.z || location.z == this.positionMax.z) && location.x >= this.positionMin.x && location.x <= this.positionMax.x));
 		}
 
 		public bool MoveNext()

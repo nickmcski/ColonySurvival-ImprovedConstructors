@@ -3,65 +3,59 @@ using Pipliz;
 
 namespace ExtendedBuilder.Persistence
 {
-    public abstract class Structure
-    {
+	public abstract class Structure
+	{
 		private Rotation currentRotation = Rotation.Front;
-        public enum Rotation
-        {
-            Front,
-            Right,
-            Back,
-            Left
-        }
+		public enum Rotation
+		{
+			Front,
+			Right,
+			Back,
+			Left
+		}
 
 		public static Rotation RotateClockwise(Rotation rotation)
 		{
 			return ((rotation + 1) & Rotation.Left); //Rotate clockwise, bitwise with 3
 		}
 
-        protected Structure(Structure structure) { }
+		protected Structure(Structure structure) { }
 
-        protected Structure(string file) { }
+		protected Structure(string file) { }
 
 		protected Structure() { }
 
 		public abstract int GetMaxX();
-        public abstract int GetMaxY();
-        public abstract int GetMaxZ();
+		public abstract int GetMaxY();
+		public abstract int GetMaxZ();
 
-        public abstract ushort GetBlock(int x, int y, int z);
-        public ushort GetBlock(Vector3Int pos)
-        {
-            return GetBlock(pos.x, pos.y, pos.z);
-        }
+		public abstract ushort GetBlock(int x, int y, int z);
+		public ushort GetBlock(Vector3Int pos)
+		{
+			return GetBlock(pos.x, pos.y, pos.z);
+		}
 
-        public abstract void Rotate();
+		public abstract void Rotate();
 
-        public void Rotate(Rotation r)
-        {
-			Chat.SendToConnected("Current: " + currentRotation.ToString());
-			if (r == currentRotation) {
-				Log.Write("Already Correct!");
-				return;
-			}
-			else
+		public void Rotate(Rotation r)
+		{
+			if (r == currentRotation)
 			{
-				Log.WriteError("Got another rotate!");
+				return; //Already correct
 			}
 
-						while(currentRotation != r)
+			while (currentRotation != r)
 			{
 				currentRotation = RotateClockwise(currentRotation);
 				Rotate();
-				Chat.SendToConnected("Rotating Structure! " + currentRotation.ToString() + " Target: " + r.ToString());
 			}
-        }
+		}
 
-        public abstract void Save(string name);
+		public abstract void Save(string name);
 
 		public string GetSizeString()
 		{
 			return GetMaxX() + " x " + GetMaxY() + " x " + GetMaxZ();
 		}
-    }
+	}
 }

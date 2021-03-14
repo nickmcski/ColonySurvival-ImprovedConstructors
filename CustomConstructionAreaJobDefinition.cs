@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Improved_Construction
 {
-    public class CustomConstructionAreaJobDefinition : ConstructionAreaDefinition
-    {
-        public CustomConstructionAreaJobDefinition()
-        {
-            Identifier = "wingdings.customconstruction";
-        }
-    }
+	public class CustomConstructionAreaJobDefinition : ConstructionAreaDefinition
+	{
+		public CustomConstructionAreaJobDefinition()
+		{
+			Identifier = "wingdings.customconstruction";
+		}
+	}
 }

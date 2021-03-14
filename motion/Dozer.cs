@@ -20,15 +20,15 @@ namespace Improved_Construction.motion
 
 
 		public List<TransportManager.Box> BoxColliders = new List<TransportManager.Box>()
-				{
-					new TransportManager.Box()
-					{
-						Size = new Vector3(1.115f, 0.56f, 1.115f),
-						Offset = new Vector3(0.0f, -0.56f, -0.145f),
-						EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
+								{
+										new TransportManager.Box()
+										{
+												Size = new Vector3(1.115f, 0.56f, 1.115f),
+												Offset = new Vector3(0.0f, -0.56f, -0.145f),
+												EulerAngles = new Vector3(0.0f, 0.0f, 0.0f)
 
-					}
-				};
+										}
+								};
 
 		public void OnAssemblyLoaded(string path)
 		{
@@ -46,7 +46,7 @@ namespace Improved_Construction.motion
 			Log.Write("Loaded the Dozer!");
 			string meshPath = MODPATH + "/meshes/Dozer.ply";
 			ServerManager.FileTable.StartLoading(meshPath, ECachedFileType.Mesh);
-		  Dozer.DozerType = MeshedObjectType.Register(new MeshedObjectTypeSettings("Dozer", meshPath, "neutral")
+			Dozer.DozerType = MeshedObjectType.Register(new MeshedObjectTypeSettings("Dozer", meshPath, "neutral")
 			{
 				colliders = BoxColliders.Select<TransportManager.Box, RotatedBounds>((Func<TransportManager.Box, RotatedBounds>)(box => box.ToRotatedBounds)).ToList<RotatedBounds>(),
 				InterpolationLooseness = 1.5f,
@@ -61,7 +61,7 @@ namespace Improved_Construction.motion
 				return;
 			Log.WriteWarning("CLICKED!");
 			click.ConsumedType = PlayerClickedData.EConsumedType.UsedAsTool;
-			Dozer.CreateGlider(click.GetExactHitPositionWorld() + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.Euler(0,-90,0), Dozer.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
+			Dozer.CreateGlider(click.GetExactHitPositionWorld() + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.Euler(0, -90, 0), Dozer.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
 		}
 
 		public static DozerTransport CreateDozerPlacer(Players.Player player, Vector3 PlaceLocation, Quaternion rotation, SelectedArea area, ConstructionPlacer placer)
@@ -75,10 +75,10 @@ namespace Improved_Construction.motion
 
 
 		public static DozerTransport CreateGlider(
-			Vector3 spawnPosition,
-			Quaternion rotation,
-			MeshedVehicleDescription vehicle,
-			Players.Player playerInside)
+				Vector3 spawnPosition,
+				Quaternion rotation,
+				MeshedVehicleDescription vehicle,
+				Players.Player playerInside)
 		{
 			DozerMover mover = new DozerMover(spawnPosition, rotation, playerInside);
 			Log.Write("The Mover is created!" + mover.ToString());

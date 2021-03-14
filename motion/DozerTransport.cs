@@ -15,15 +15,14 @@ namespace Improved_Construction.motion
 	public class DozerTransport : TransportManager.GenericTransport
 	{
 		public DozerTransport(
-				DozerMover mover,
-				MeshedVehicleDescription description,
-				InventoryItem refundItems)
-				: base((TransportManager.ITransportMovement)mover, description, refundItems)
-		{}
+						DozerMover mover,
+						MeshedVehicleDescription description,
+						InventoryItem refundItems)
+						: base((TransportManager.ITransportMovement)mover, description, refundItems)
+		{ }
 
 		public override JObject Save()
 		{
-			Log.Write("ERROR - Saving Transport????");
 			//No need to save/load
 			return null;
 		}
@@ -57,17 +56,17 @@ namespace Improved_Construction.motion
 					samePosition++;
 					return;
 				}
-				if(samePosition == UPDATE_DELAY)
+				if (samePosition == UPDATE_DELAY)
 				{
 					samePosition++;
 					ConstructionPlacer.Show(player); //TODO null check
 					return;
 				}
-				
+
 				return;
 			}
 
-			string input= "";
+			string input = "";
 
 			Pipliz.Vector3Int offset = Pipliz.Vector3Int.zero;
 
@@ -106,7 +105,7 @@ namespace Improved_Construction.motion
 			}
 
 
-			if(samePosition >= UPDATE_DELAY) //We have already drawn the shape and need to clear it
+			if (samePosition >= UPDATE_DELAY) //We have already drawn the shape and need to clear it
 			{
 				ConstructionPlacer.ClearChunk(player);
 			}
@@ -123,16 +122,13 @@ namespace Improved_Construction.motion
 				selection.Move(offset);
 				AreaJobTracker.SendData(((DozerMover)Mover).LastInputPlayer);
 			}
-			}
+		}
 
 		private Pipliz.Vector3Int rotateInput(Pipliz.Vector3Int input, UnityEngine.Quaternion rotation)
 		{
 
 
-			float angle = (rotation.eulerAngles.y + 45) %365;
-			Log.WriteWarning("ANGLE: " + angle);
-			Log.Write("Angles: " + rotation.eulerAngles);
-			Log.Write("Rotation: " + rotation.ToString());
+			float angle = (rotation.eulerAngles.y + 45) % 365;
 
 			if (angle < 0)
 				angle = 360 + angle; //Reset back to 360 base.
@@ -143,13 +139,13 @@ namespace Improved_Construction.motion
 				//(90 Clock - Facing positive Z
 				return new Pipliz.Vector3Int(input.z, input.y, input.x);
 			}
-			if(angle < 180)
+			if (angle < 180)
 				return new Pipliz.Vector3Int(input.x, input.y, -input.z);
 
-			if(angle < 270)
+			if (angle < 270)
 				return new Pipliz.Vector3Int(-input.z, input.y, -input.x);
 
-			if(angle < 360)
+			if (angle < 360)
 				return new Pipliz.Vector3Int(-input.x, input.y, input.z);
 
 			return input;

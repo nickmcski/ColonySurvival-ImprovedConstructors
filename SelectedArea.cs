@@ -75,7 +75,7 @@ namespace Improved_Construction
 			var offset = (cornerMax - cornerMin) / 2;
 
 			cornerMin = new Vector3Int(center.x - offset.z, cornerMin.y, center.z - offset.x);
-			cornerMax	= new Vector3Int(center.x + offset.z, cornerMax.y, center.z + offset.x);
+			cornerMax = new Vector3Int(center.x + offset.z, cornerMax.y, center.z + offset.x);
 			pos1 = cornerMin;
 			pos2 = cornerMax;
 			//TODO Shift corners around centerpoint
