@@ -7,6 +7,7 @@ using System.Linq;
 using BlockTypes;
 using ModLoaderInterfaces;
 using static ItemTypes;
+using System;
 
 namespace ExtendedBuilder.Jobs
 {
@@ -56,10 +57,19 @@ namespace ExtendedBuilder.Jobs
                     break;
                 }
 
-                var adjX = iterationType.CurrentPosition.x - bpi.location.x;
-                var adjY = iterationType.CurrentPosition.y - bpi.location.y;
-                var adjZ = iterationType.CurrentPosition.z - bpi.location.z;
-                var block = bpi.BuilderSchematic.GetBlock(adjX, adjY, adjZ);
+                var adjX = bpi.CurrentPosition.x - bpi.location.x;
+                var adjY = bpi.CurrentPosition.y - bpi.location.y;
+                var adjZ = bpi.CurrentPosition.z - bpi.location.z;
+				ushort block;
+				try
+				{
+					block = bpi.BuilderSchematic.GetBlock(adjX, adjY, adjZ);
+				}catch(Exception ex)
+				{
+					Log.WriteException("Error at block " + adjX + "," + adjY + "," + adjZ, ex);
+					iterationType.MoveNext();
+					continue;
+				}
                 var buildType = ItemTypes.GetType(block);
 
                 if (buildType == null)
@@ -202,7 +212,7 @@ namespace ExtendedBuilder.Jobs
 
         public static float GetCooldown()
         {
-            return Random.NextFloat(1.5f, 2.5f);
+            return Pipliz.Random.NextFloat(1.5f, 2.5f);
         }
     }
 }

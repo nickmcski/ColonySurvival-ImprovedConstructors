@@ -45,10 +45,27 @@ namespace Improved_Construction.motion
 			}
 		}
 
+		public int samePosition = UPDATE_DELAY;
+		public static int UPDATE_DELAY = 5;
+
 		public override void ProcessInputs(Players.Player player, Pipliz.Collections.SortedList<EInputKey, float> keyTimes, float deltaTime)
 		{
 			if (keyTimes.Count == 0)
+			{
+				if (samePosition < UPDATE_DELAY)
+				{
+					samePosition++;
+					return;
+				}
+				if(samePosition == UPDATE_DELAY)
+				{
+					samePosition++;
+					ConstructionPlacer.Show(player); //TODO null check
+					return;
+				}
+				
 				return;
+			}
 
 			string input= "";
 
@@ -84,10 +101,18 @@ namespace Improved_Construction.motion
 						break;
 				}
 				UnityEngine.Quaternion rotation = player.Rotation;
+
 				offset = rotateInput(offset, rotation);
 			}
 
+
+			if(samePosition >= UPDATE_DELAY) //We have already drawn the shape and need to clear it
+			{
+				ConstructionPlacer.ClearChunk(player);
+			}
+
 			move(offset);
+			samePosition = -1;
 		}
 
 		private void move(Pipliz.Vector3Int offset)
@@ -153,18 +178,12 @@ namespace Improved_Construction.motion
 				if (!attached)
 				{
 					MeshedObjectManager.Attach(sender, this.VehicleDescription);
-					if (placer != null)
-					{
-						placer.ClearChunk(sender);
-					}
+					ConstructionPlacer.ClearChunk(sender);
 				}
 				else
 				{
 					MeshedObjectManager.Detach(sender);
-					if (placer != null)
-					{
-						placer.Show(sender);
-					}
+					ConstructionPlacer.Show(sender);
 				}
 			}
 

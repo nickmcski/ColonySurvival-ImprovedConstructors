@@ -1,4 +1,5 @@
-﻿using Chatting;
+﻿using BlockTypes;
+using Chatting;
 using ExtendedBuilder.Jobs;
 using ExtendedBuilder.Persistence;
 using Improved_Construction.motion;
@@ -13,11 +14,7 @@ using Pipliz;
 using Pipliz.JSON;
 using Science;
 using Shared;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Players;
 
 namespace Improved_Construction
@@ -74,6 +71,7 @@ namespace Improved_Construction
 				TriggerHoverCallback = true
 		  };
 		}
+
 			public bool TryDoCommand(Players.Player player, string chat, List<string> splits)
 		{
 			switch (splits[0])
@@ -89,6 +87,9 @@ namespace Improved_Construction
 					return true;
 				case "/chunk":
 					ClearChunk(player);
+					return true;
+				case "/rotate":
+					Rotate(player);
 					return true;
 			}
 			return false;
@@ -173,15 +174,9 @@ namespace Improved_Construction
 
 		public void Apply(Player player)
 		{
-			if (player == null)
+			SelectedArea selected = GetSelected(player);
+			if (selected == null)
 				return;
-			int foundIndex;
-			if(!selectionTracker.Contains(player, out foundIndex))
-			{
-				Chat.Send(player, "You don't have valid selection");
-				return;
-			}
-			SelectedArea selected = selectionTracker.GetValueAtIndex(foundIndex);
 
 			JSONNode args = selected.args;
 			args.SetAs("constructionType", StructureBuilderLoader.NAME);
@@ -190,8 +185,8 @@ namespace Improved_Construction
 			//args.SetAs(StructureBuilderLoader.NAME + ".LocationY", location.y);
 			//args.SetAs(StructureBuilderLoader.NAME + ".LocationZ", location.z);
 
-			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.corner1, selected.corner2);
-			selectionTracker.RemoveAt(foundIndex);
+			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.cornerMin, selected.cornerMax);
+			selectionTracker.Remove(player);
 
 			AreaJobTracker.SendData(player);
 
@@ -204,22 +199,42 @@ namespace Improved_Construction
 
 		}
 
-		public void Show(Player player)
+		public static SelectedArea GetSelected(Player player)
 		{
 			if (player == null)
-				return;
+				return null;
 			int foundIndex;
 			if (!selectionTracker.Contains(player, out foundIndex))
 			{
 				Chat.Send(player, "You don't have valid selection");
-				return;
+				return null;
 			}
-			SelectedArea selected = selectionTracker.GetValueAtIndex(foundIndex);
+			return selectionTracker.GetValueAtIndex(foundIndex);
+		}
+
+		public void Rotate(Player player)
+		{
+			SelectedArea selected = GetSelected(player);
+			if (selected == null)
+				return;
+			ClearChunk(player);
+			selected.Rotate();
+			AreaJobTracker.SendData(player);
+			Show(player);
+
+		}
+
+		public static void Show(Player player)
+		{
+			SelectedArea selected = GetSelected(player);
+			if (selected == null)
+				return;
 
 			JSONNode args = selected.args;
 			args.SetAs("constructionType", StructureBuilderLoader.NAME);
+			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", selected.rotation);
 
-			ConstructionArea area = new ConstructionArea(null, null, selected.corner1, selected.corner2);
+			ConstructionArea area = new ConstructionArea(null, null, selected.cornerMin, selected.cornerMax);
 			area.SetArgument(args);
 			string structureName;
 			if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
@@ -227,15 +242,7 @@ namespace Improved_Construction
 				Log.WriteError("Could not get structure!");
 				return;
 			}
-			Structure.Rotation rotation;
-			if (!args.TryGetAs<Structure.Rotation>(StructureBuilderLoader.NAME + ".Rotation", out rotation))
-			{
-				Log.WriteError("Could not get rotation!");
-				return;
-			}
-
-			StructureIterator iterator = new StructureIterator(area, structureName, rotation);
-			GhostHelper.FillGhost(iterator);
+			GhostHelper.FillGhost((StructureIterator) area.IterationType);
 		}
 
 		public void OnConstructTooltipUI(Player player, ConstructTooltipUIData data)
@@ -272,8 +279,25 @@ namespace Improved_Construction
 			SelectedArea selection;
 			if(selectionTracker.TryGetValue(player, out selection))
 			{
-				ClearChunk(selection.corner1, selection.corner2, player);
-				Chat.Send(player, "Resent Chunks");
+
+				SelectedArea selected = GetSelected(player);
+				if (selected == null)
+					return;
+
+				JSONNode args = selected.args;
+				args.SetAs("constructionType", StructureBuilderLoader.NAME);
+				args.SetAs(StructureBuilderLoader.NAME + ".Rotation", selected.rotation);
+
+				ConstructionArea area = new ConstructionArea(null, null, selected.cornerMin, selected.cornerMax);
+				area.SetArgument(args);
+				string structureName;
+				if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
+				{
+					Log.WriteError("Could not get structure!");
+					return;
+				}
+				GhostHelper.FillGhost((StructureIterator)area.IterationType, BuiltinBlocks.Types.air);
+				//ClearChunk(selection.cornerMin, selection.cornerMax, player);
 				return;
 			}
 

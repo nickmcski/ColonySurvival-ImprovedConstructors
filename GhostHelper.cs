@@ -11,10 +11,12 @@ namespace Improved_Construction
 	{
 		private static int MAX_GHOST_BLOCKS = 1000;
 
-		public static void FillGhost(StructureIterator bpi)
+		public static void FillGhost(StructureIterator bpi, ItemType fillBlock = null)
 		{
+			if (fillBlock == null)
+				fillBlock = ItemTypes.GetType("ghost");
+
 			int blocks = 0;
-			ItemType ghostBlock = ItemTypes.GetType("ghost");
 			while (blocks <= MAX_GHOST_BLOCKS) // This is to move past air.
 			{
 				if (!bpi.MoveNext())
@@ -37,7 +39,7 @@ namespace Improved_Construction
 				{
 					if (foundTypeIndex != BuiltinBlocks.Indices.air)
 						continue;
-					SendGhostBlock(null, bpi.CurrentPosition, ghostBlock);
+					SendGhostBlock(null, bpi.CurrentPosition, fillBlock);
 				}
 
 			}
@@ -52,7 +54,7 @@ namespace Improved_Construction
 				data.WriteVariable(type.ItemIndex);
 				Players.SendToNearbyDrawDistance(position, data, 200, NetworkMessageReliability.Unreliable);
 			}
-			Log.Write("Sending ghost block!" + position.ToString());
+			//Log.Write("Sending ghost block!" + position.ToString());
 		}
 	}
 }

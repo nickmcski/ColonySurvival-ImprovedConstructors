@@ -20,11 +20,12 @@ namespace ExtendedBuilder.Jobs
 				public string SchematicName { get; private set; }
         public Structure BuilderSchematic { get; private set; }
 
-        public StructureIterator(ConstructionArea area, string schematicName, Structure.Rotation rotation = Structure.Rotation.Front)
+        public StructureIterator(ConstructionArea area, string schematicName, Structure.Rotation rotation)
         {
             this.area = area;
+			this.rotation = rotation;
 
-            positionMin = area.Minimum;
+			positionMin = area.Minimum;
             positionMax = area.Maximum;
 			      this.location = area.Minimum;
 
@@ -42,7 +43,6 @@ namespace ExtendedBuilder.Jobs
 
                 return;
             }
-			this.rotation = rotation;
             BuilderSchematic.Rotate(rotation);
         }
 

@@ -1,9 +1,11 @@
-﻿using Pipliz;
+﻿using Chatting;
+using Pipliz;
 
 namespace ExtendedBuilder.Persistence
 {
     public abstract class Structure
     {
+		private Rotation currentRotation = Rotation.Front;
         public enum Rotation
         {
             Front,
@@ -37,22 +39,22 @@ namespace ExtendedBuilder.Persistence
 
         public void Rotate(Rotation r)
         {
-            int rotation = 1;
+			Chat.SendToConnected("Current: " + currentRotation.ToString());
+			if (r == currentRotation) {
+				Log.Write("Already Correct!");
+				return;
+			}
+			else
+			{
+				Log.WriteError("Got another rotate!");
+			}
 
-            if (r == Rotation.Right)
-                rotation = 1;
-
-            if (r == Rotation.Back)
-                rotation = 1;
-
-            if (r == Rotation.Left)
-                rotation = 1;
-
-            if (r == Rotation.Front)
-                return;
-
-            for (int i = 0; i < rotation; i++)
-                Rotate();
+						while(currentRotation != r)
+			{
+				currentRotation = RotateClockwise(currentRotation);
+				Rotate();
+				Chat.SendToConnected("Rotating Structure! " + currentRotation.ToString() + " Target: " + r.ToString());
+			}
         }
 
         public abstract void Save(string name);
