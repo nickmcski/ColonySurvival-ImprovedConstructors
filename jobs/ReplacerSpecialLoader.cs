@@ -1,7 +1,7 @@
 ﻿using Jobs.Implementations.Construction;
 using Jobs.Implementations.Construction.Iterators;
+using Newtonsoft.Json.Linq;
 using Pipliz;
-using Pipliz.JSON;
 
 namespace Improved_Construction
 {
@@ -17,7 +17,7 @@ namespace Improved_Construction
 			}
 		}
 
-		public void ApplyTypes(ConstructionArea area, JSONNode node)
+		public void ApplyTypes(ConstructionArea area, JObject node)
 		{
 			Log.Write("Appling Types " + node.ToString());
 			ReplaceType type = new ReplaceType(node);
@@ -25,7 +25,7 @@ namespace Improved_Construction
 			area.IterationType = (IIterationType)new TopToBottom(area);
 		}
 
-		public void SaveTypes(ConstructionArea area, JSONNode node)
+		public void SaveTypes(ConstructionArea area, JObject node)
 		{
 		}
 
@@ -39,7 +39,7 @@ namespace Improved_Construction
 				this.place = place;
 			}
 
-			public ReplaceType(JSONNode node)
+			public ReplaceType(JObject node)
 			{
 				ushort dig;
 				ushort place;

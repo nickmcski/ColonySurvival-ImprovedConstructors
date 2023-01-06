@@ -1,7 +1,8 @@
 ﻿using Jobs.Implementations.Construction;
 using ExtendedBuilder.Persistence;
-using Pipliz.JSON;
 using ModLoaderInterfaces;
+using Newtonsoft.Json.Linq;
+using Pipliz;
 
 namespace ExtendedBuilder.Jobs
 {
@@ -12,7 +13,12 @@ namespace ExtendedBuilder.Jobs
 
 		public string JobName => NAME;
 
-		public void ApplyTypes(ConstructionArea area, JSONNode node)
+		public void AfterItemTypesDefined()
+		{
+			ConstructionArea.RegisterLoader(new StructureBuilderLoader());
+		}
+
+		public void ApplyTypes(ConstructionArea area, JObject node)
 		{
 			if (node == null)
 				return;
@@ -25,26 +31,20 @@ namespace ExtendedBuilder.Jobs
 			}
 		}
 
-		public void SaveTypes(ConstructionArea area, JSONNode node)
+		public void SaveTypes(ConstructionArea area, JObject node)
 		{
 			var itt = area.IterationType as StructureIterator;
 
 			if (itt != null)
 			{
 				node.SetAs(NAME + ".StructureName", itt.SchematicName);
-				node.SetAs(NAME + ".Rotation", itt.rotation);
+				node.SetAs(NAME + ".Rotation", (int)itt.rotation);
 
 				node.SetAs(NAME + ".LocationX", itt.location.x);
 				node.SetAs(NAME + ".LocationY", itt.location.y);
 				node.SetAs(NAME + ".LocationZ", itt.location.z);
 
 			}
-		}
-
-
-		public void AfterItemTypesDefined()
-		{
-			ConstructionArea.RegisterLoader(new StructureBuilderLoader());
 		}
 	}
 }

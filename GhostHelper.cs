@@ -52,7 +52,7 @@ namespace Improved_Construction
 				data.Write(ClientMessageType.BlockChange);
 				data.WriteVariable(position);
 				data.WriteVariable(type.ItemIndex);
-				Players.SendToNearbyDrawDistance(position, data, 200, NetworkMessageReliability.Unreliable);
+				Players.SendToNearbyDrawDistance(position, data, 200);
 			}
 			//Log.Write("Sending ghost block!" + position.ToString());
 		}

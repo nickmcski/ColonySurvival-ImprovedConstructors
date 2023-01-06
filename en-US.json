@@ -19,12 +19,12 @@
       },
       "research": {
         "2d": {
-          "name" : "Basic Geometry",
-          "description" : "Congratulations! It was difficuly, but your colonists understand what a circle is!"
+          "name": "Basic Geometry",
+          "description": "Congratulations! It was difficult, but your colonists understand what a circle is!"
         },
         "3d": {
-          "name" : "Advanced Geometry",
-          "description" : "Are you smarter than a 5th grader?"
+          "name": "Advanced Geometry",
+          "description": "Are you smarter than a 5th grader?"
         }
       },
       "builder": {

@@ -6,7 +6,6 @@ using NetworkUI.AreaJobs;
 using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
-using Pipliz.JSON;
 using Science;
 using Shared;
 using System;
@@ -15,7 +14,7 @@ using System.Reflection;
 namespace Improved_Construction
 {
 	[ModLoader.ModManager]
-	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnPlayerSelectedTypePopup, IOnAssemblyLoaded
+	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnAssemblyLoaded
 	{
 		public void OnAssemblyLoaded(string path)
 		{
@@ -38,6 +37,7 @@ namespace Improved_Construction
 			CommandToolManager.AddButtonTooltip("wingdings.tooljob.circle", "wingdings.tooljob.circlea", "wingdings.tooljob.circleb");
 		}
 
+		[ModLoader.ModCallback("wingdings_shapes", 5f)]
 		public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)
 		{
 			if (menuName != "popup.tooljob.construction")
@@ -71,8 +71,11 @@ namespace Improved_Construction
 			switch (data.ButtonIdentifier)
 			{
 				case "wingdings.replacer":
-					JSONNode payload = new JSONNode(NodeType.Object).SetAs<int>("wingdings.construction.selection", 1);
-					NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, payload);
+					JObject jObjects = new JObject()
+					{
+						{"wingdings.construction.selection", 1 }
+					};
+					NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, jObjects);
 					return;
 				case "windings.shapes":
 					SendShapeMenu(data.Player);
@@ -82,7 +85,8 @@ namespace Improved_Construction
 			}
 		}
 
-		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JSONNode payload)
+		[ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerSelectedTypePopup, "traderule")]
+		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JObject payload)
 		{
 			int result;
 			if (!payload.TryGetAs<int>("wingdings.construction.selection", out result))
@@ -90,8 +94,8 @@ namespace Improved_Construction
 			switch (result)
 			{
 				case 1:
-					payload.SetAs<int>("wingdings.construction.selection1", typeSelected);
-					payload.SetAs<int>("wingdings.construction.selection", 2);
+					payload["wingdings.construction.selection1"] =  typeSelected;
+					payload["wingdings.construction.selection"] = 2;
 
 					//Send blank menu. TriggerTypeSelectionPopup will only work when a menu is open
 					NetworkMenu menu = new NetworkMenu();
@@ -100,8 +104,8 @@ namespace Improved_Construction
 					NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, payload);
 					break;
 				case 2:
-					payload.SetAs<int>("wingdings.construction.selection2", typeSelected);
-					payload.SetAs<string>("constructionType", "wingdings.customconstruction");
+					payload["wingdings.construction.selection2"] = typeSelected;
+					payload["constructionType"] =  "wingdings.customconstruction";
 
 					int limt = player.ActiveColony?.BuilderSizeLimit ?? Colony.BUILDER_LIMIT_START;
 

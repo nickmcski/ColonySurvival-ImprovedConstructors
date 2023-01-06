@@ -11,7 +11,6 @@ using NetworkUI;
 using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
-using Pipliz.JSON;
 using Science;
 using Shared;
 using System.Collections.Generic;
@@ -26,7 +25,7 @@ namespace Improved_Construction
 		public static void SendSelectionMenu(Players.Player player)
 		{
 			NetworkMenu menu = new NetworkMenu();
-			menu.LocalStorage.SetAs<string>("header", "Structures");
+			menu.LocalStorage["header"] =  "Structures";
 			menu.Width = 600; //TODO Tweak size
 			menu.Height = 300;
 
@@ -114,18 +113,18 @@ namespace Improved_Construction
 				Chat.Send(data.Player, "Null structure");
 				return;
 			}
-			Vector3Int location = new Vector3Int(data.Player.Position);
+			Vector3Int location = (data.Player.VoxelPosition);
 			location.x -= structure.GetMaxX() / 2;
 
 			Vector3Int maxSize;
 
 			maxSize = location.Add(structure.GetMaxX(), structure.GetMaxY(), structure.GetMaxZ());
-
-			JSONNode args = new JSONNode();
-			args.SetAs("constructionType", StructureBuilderLoader.NAME);
-
-			args.SetAs(StructureBuilderLoader.NAME + ".StructureName", structureName);
-			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", Structure.Rotation.Front); //TODO Take player facing direction??
+			JObject args = new JObject()
+					{
+				{"constructionType",  StructureBuilderLoader.NAME },
+				{StructureBuilderLoader.NAME + ".StructureName", structureName },
+				{StructureBuilderLoader.NAME + ".Rotation", Structure.Rotation.Front },//TODO Take player facing direction??
+			};
 
 			SelectedArea selection = setSelection(data.Player, location, maxSize, args);
 			Show(data.Player);
@@ -140,7 +139,7 @@ namespace Improved_Construction
 
 		public static Pipliz.Collections.SortedList<Player, SelectedArea> selectionTracker = new Pipliz.Collections.SortedList<Player, SelectedArea>();
 
-		public static SelectedArea setSelection(Player player, Vector3Int loc1, Vector3Int loc2, JSONNode args = null)
+		public static SelectedArea setSelection(Player player, Vector3Int loc1, Vector3Int loc2, JToken args = null)
 		{
 			int foundIndex;
 			SelectedArea selected;
@@ -178,10 +177,12 @@ namespace Improved_Construction
 			if (selected == null)
 				return;
 
-			JSONNode args = selected.args;
-			args.SetAs("constructionType", StructureBuilderLoader.NAME);
+			JObject args = new JObject()
+					{
+				{"constructionType",  StructureBuilderLoader.NAME },
+			};
 
-			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.cornerMin, selected.cornerMax);
+			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.Minimum, selected.Maximum);
 			selectionTracker.Remove(player);
 
 			AreaJobTracker.SendData(player);
@@ -226,11 +227,13 @@ namespace Improved_Construction
 			if (selected == null)
 				return;
 
-			JSONNode args = selected.args;
-			args.SetAs("constructionType", StructureBuilderLoader.NAME);
-			args.SetAs(StructureBuilderLoader.NAME + ".Rotation", selected.rotation);
+			JObject args = new JObject()
+					{
+				{"constructionType",  StructureBuilderLoader.NAME },
+				{StructureBuilderLoader.NAME + ".Rotation", selected.rotation },
+			};
 
-			ConstructionArea area = new ConstructionArea(null, null, selected.cornerMin, selected.cornerMax);
+			ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
 			area.SetArgument(args);
 			string structureName;
 			if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
@@ -245,8 +248,6 @@ namespace Improved_Construction
 		{
 			if (data.hoverType != ETooltipHoverType.NetworkUiButton)
 				return;
-
-			Log.Write(data.hoverKey);
 		}
 
 		public static void ClearChunk(Vector3Int blockMin, Vector3Int blockMax, Player p)
@@ -280,11 +281,13 @@ namespace Improved_Construction
 				if (selected == null)
 					return;
 
-				JSONNode args = selected.args;
-				args.SetAs("constructionType", StructureBuilderLoader.NAME);
-				args.SetAs(StructureBuilderLoader.NAME + ".Rotation", selected.rotation);
+				JObject args = new JObject()
+					{
+				{"constructionType",  StructureBuilderLoader.NAME },
+				{StructureBuilderLoader.NAME + ".Rotation", selected.rotation },
+			};
 
-				ConstructionArea area = new ConstructionArea(null, null, selected.cornerMin, selected.cornerMax);
+				ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
 				area.SetArgument(args);
 				string structureName;
 				if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
@@ -303,6 +306,7 @@ namespace Improved_Construction
 			return;
 		}
 
+		[ModLoader.ModCallback("wingdings_blueprints", 10f)]
 		public void OnConstructCommandTool(Player p, NetworkMenu menu, string menuName)
 		{
 			if (menuName != "popup.tooljob.construction")
