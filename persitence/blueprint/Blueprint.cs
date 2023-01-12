@@ -126,7 +126,8 @@ namespace ExtendedBuilder.Persistence
 							new_type_index = BuiltinBlocks.Indices.missingerror;
 
 						typesTransformation.Add(type_index, new_type_index);
-						types.Add(new_type_index, type_name);
+						if(!types.ContainsKey(new_type_index))
+							types.Add(new_type_index, type_name);
 					} //type
 
 					blocks = new ushort[xSize, ySize, zSize];

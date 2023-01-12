@@ -227,11 +227,11 @@ namespace Improved_Construction
 			if (selected == null)
 				return;
 
-			JObject args = new JObject()
-					{
-				{"constructionType",  StructureBuilderLoader.NAME },
-				{StructureBuilderLoader.NAME + ".Rotation", (int) selected.rotation },
-			};
+			JObject args = (JObject)selected.args; //I think all the args should be the same?
+
+			//args["constructionType"] = StructureBuilderLoader.NAME;
+			//args[StructureBuilderLoader.NAME + ".StructureName"] = StructureBuilderLoader.NAME;
+			//args[StructureBuilderLoader.NAME + ".Rotation"] = selected.rotation;
 
 			ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
 			area.SetArgument(args);

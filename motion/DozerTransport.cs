@@ -27,6 +27,7 @@ namespace Improved_Construction.motion
 		{
 			IsValid = true;
 			Position = new Pipliz.Vector3Int(startPosition);
+			nextPosition = Position;
 			VehicleDescription = description;
 			Settings = settings;
 			NextUpdate = ServerTimeStamp.Now;
@@ -66,11 +67,17 @@ namespace Improved_Construction.motion
 			{
 				return true;
 			}
+			//if(Position == nextPosition)
+			//{
+			//	return true;
+			//}
 			if (!MeshedObjectManager.TryGetVehicle(Player, out var playerVehicle) || playerVehicle.Object.ObjectID.ID != VehicleDescription.Object.ObjectID.ID)
 			{
 				OnRemove();
 				return false;
 			}
+			//VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(Position.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
+			//return true;
 			int maxPerUpdate = 10 * 1;
 			while (NextUpdate.IsPassed)
 			{
@@ -79,11 +86,11 @@ namespace Improved_Construction.motion
 					NextUpdate = ServerTimeStamp.Now.Add(UPDATE_DELAY);
 					break;
 				}
-						Position = nextPosition;
-						VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(Position.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
-						LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
-						NextUpdate = NextUpdate.Add(UpdateDelayMS * 4);
-						continue;
+				Position = nextPosition;
+
+				LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
+				NextUpdate = NextUpdate.Add(UpdateDelayMS * 4);
+				continue;
 
 			}
 			if (Pipliz.Time.SecondsSinceStartDoubleThisFrame - (double)Settings.BackupSendingTimeoutSeconds > LastSendRealTime)
@@ -269,12 +276,12 @@ namespace Improved_Construction.motion
 
 		public void OnPlayerAttached(Players.Player player)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public void OnPlayerDetached(Players.Player player)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 	}
 }

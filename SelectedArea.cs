@@ -15,7 +15,7 @@ using Math = Pipliz.Math;
 
 namespace Improved_Construction
 {
-	public class SelectedArea : IAreaJob
+	public class SelectedArea
 	{
 		public Rotation rotation = Structure.Rotation.Front;
 
@@ -40,18 +40,6 @@ namespace Improved_Construction
 		public JToken args;
 		public Vector3Int Minimum { get; internal set; }
 		public Vector3Int Maximum { get; internal set; }
-		public AreaJobIndex AreaJobIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-		public bool IsDirty { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-
-		public NPCBase NPC => throw new NotImplementedException();
-
-		public Colony Owner => throw new NotImplementedException();
-
-		public IAreaJobDefinition Definition => throw new NotImplementedException();
-
-		public bool IsValid => throw new NotImplementedException();
 
 		public bool IsPos1Initialized() { return pos1 != Vector3Int.maximum; }
 		public bool IsPos2Initialized() { return pos2 != Vector3Int.maximum; }
@@ -97,8 +85,18 @@ namespace Improved_Construction
 
 		public AreaHighlight GetAreaHighlight() //Change to IAreaJob
 		{
-			return new AreaHighlight(this);
+			AreaHighlight highlight = new AreaHighlight()
+			{
+				Minimum = this.Minimum,
+				Maximum = this.Maximum,
+				AreaType = Shared.EServerAreaType.Default,
+				MeshType = Shared.EAreaMeshType.AutoSelectActive,
+				TriggerLimitsUI = false,
+				//AssociatedNPCType = ,
+				AreaJobIndex = new AreaJobIndex(0)
 
+			};
+			return highlight;
 			//cornerMin, cornerMax, Shared.EAreaMeshType.AutoSelectActive, Shared.EServerAreaType.Default
 		}
 
@@ -108,16 +106,6 @@ namespace Improved_Construction
 			pos1 += offset;
 			pos2 += offset;
 			UpdateCorner();
-		}
-
-		public void OnRemove()
-		{
-			throw new NotImplementedException();
-		}
-
-		public JToken GetMiscSaveData()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

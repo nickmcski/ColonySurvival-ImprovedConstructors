@@ -10,13 +10,15 @@ using Science;
 using Shared;
 using System;
 using System.Reflection;
+using static Players;
 
 namespace Improved_Construction
 {
 	[ModLoader.ModManager]
-	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnAssemblyLoaded
+	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IAfterSelectedWorld
 	{
-		public void OnAssemblyLoaded(string path)
+		[ModLoader.ModCallback("wingdings_load", 20f)]
+		public void AfterSelectedWorld()
 		{
 			//Register loader for Construction job callback
 			ConstructionArea.RegisterLoader((IConstructionLoader)new ReplacerSpecialLoader());
@@ -38,7 +40,7 @@ namespace Improved_Construction
 		}
 
 		[ModLoader.ModCallback("wingdings_shapes", 5f)]
-		public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)
+		public void OnConstructCommandTool(Player p, NetworkMenu menu, string menuName)
 		{
 			if (menuName != "popup.tooljob.construction")
 				return;

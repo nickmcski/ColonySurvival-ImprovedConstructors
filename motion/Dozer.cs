@@ -84,7 +84,8 @@ namespace Improved_Construction.motion
 		{
 
 			Log.Write("Start creating Dozer");
-			DozerTransport vehicle1 = DozerTransport.CreateDozer(spawnPosition, rotation, vehicle, playerInside, null);
+			DozerSettings settings = new DozerSettings();
+			DozerTransport vehicle1 = DozerTransport.CreateDozer(spawnPosition, rotation, vehicle, playerInside, settings);
 			Log.Write("Created Dozer!" + vehicle1.ToString());
 			MeshedObjectManager.Attach(playerInside, vehicle);
 			return vehicle1;

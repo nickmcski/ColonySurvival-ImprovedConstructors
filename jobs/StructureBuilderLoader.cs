@@ -22,10 +22,11 @@ namespace ExtendedBuilder.Jobs
 		{
 			if (node == null)
 				return;
-
+			int rotation_int;
 			if (node.TryGetAs(NAME + ".StructureName", out string schematic)
-					 && node.TryGetAs(NAME + ".Rotation", out Structure.Rotation rotation))
+					 && node.TryGetAs(NAME + ".Rotation", out rotation_int))
 			{
+				Structure.Rotation rotation = (Structure.Rotation) rotation_int;
 				area.IterationType = new StructureIterator(area, schematic, rotation);
 				area.ConstructionType = new StructureBuilder();
 			}

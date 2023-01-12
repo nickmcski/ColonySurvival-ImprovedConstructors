@@ -1,4 +1,6 @@
 ﻿using Chatting;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 using Pipliz;
 
 namespace ExtendedBuilder.Persistence
@@ -6,6 +8,8 @@ namespace ExtendedBuilder.Persistence
 	public abstract class Structure
 	{
 		private Rotation currentRotation = Rotation.Front;
+
+		[JsonConverter(typeof(StringEnumConverter))]
 		public enum Rotation
 		{
 			Front,
