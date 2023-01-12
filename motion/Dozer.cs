@@ -45,13 +45,15 @@ namespace Improved_Construction.motion
 		{
 			Log.Write("Loaded the Dozer!");
 			string meshPath = MODPATH + "/meshes/Dozer.ply";
-			ServerManager.FileTable.StartLoading(meshPath, ECachedFileType.Mesh);
-			Dozer.DozerType = MeshedObjectType.Register(new MeshedObjectTypeSettings("Dozer", meshPath, "neutral")
+			FileTable.FileID fileID = ServerManager.FileTable.StartLoading(meshPath, ECachedFileType.MeshPly);
+			MeshedObjectTypeSettings meshSettings = new MeshedObjectTypeSettings("Dozer", fileID, "neutral")
 			{
-				colliders = BoxColliders.Select<TransportManager.Box, RotatedBounds>((Func<TransportManager.Box, RotatedBounds>)(box => box.ToRotatedBounds)).ToList<RotatedBounds>(),
+				colliders = new List<ObjectCollider>(),
 				InterpolationLooseness = 1.5f,
 				sendUpdateRadius = 500
-			});
+			};
+			meshSettings.colliders.Add(new ObjectCollider(BoxColliders[0].ToRotatedBounds));
+			Dozer.DozerType = MeshedObjectType.Register(meshSettings);
 		}
 
 		public void OnPlayerClicked(Players.Player player, PlayerClickedData click)
@@ -61,12 +63,12 @@ namespace Improved_Construction.motion
 				return;
 			Log.WriteWarning("CLICKED!");
 			click.ConsumedType = PlayerClickedData.EConsumedType.UsedAsTool;
-			Dozer.CreateGlider(click.GetExactHitPositionWorld() + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.Euler(0, -90, 0), Dozer.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
+			Dozer.CreateGlider(click.GetExactHitPositionWorld() + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.Euler(0, -90, 0), DozerTransport.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
 		}
 
 		public static DozerTransport CreateDozerPlacer(Players.Player player, Vector3 PlaceLocation, Quaternion rotation, SelectedArea area, ConstructionPlacer placer)
 		{
-			DozerTransport dozerPlacer = Dozer.CreateGlider(PlaceLocation, rotation, Dozer.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
+			DozerTransport dozerPlacer = Dozer.CreateGlider(PlaceLocation, rotation, DozerTransport.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
 			dozerPlacer.setArea(area);
 			dozerPlacer.setPlacer(placer);
 
@@ -80,18 +82,12 @@ namespace Improved_Construction.motion
 				MeshedVehicleDescription vehicle,
 				Players.Player playerInside)
 		{
-			DozerMover mover = new DozerMover(spawnPosition, rotation, playerInside);
-			Log.Write("The Mover is created!" + mover.ToString());
-			DozerTransport vehicle1 = new DozerTransport(mover, vehicle, new InventoryItem(ItemTypes.GetType("ghost").ItemIndex, 1));
-			mover.SetParent(vehicle1);
-			TransportManager.RegisterTransport((TransportManager.ITransportVehicle)vehicle1);
+
+			Log.Write("Start creating Dozer");
+			DozerTransport vehicle1 = DozerTransport.CreateDozer(spawnPosition, rotation, vehicle, playerInside, null);
 			Log.Write("Created Dozer!" + vehicle1.ToString());
 			MeshedObjectManager.Attach(playerInside, vehicle);
 			return vehicle1;
-		}
-		public static MeshedVehicleDescription CreateVehicleDescription(MeshedObjectID ID)
-		{
-			return new MeshedVehicleDescription(new ClientMeshedObject(Dozer.DozerType, ID), new Vector3(0.0f, 1.25f, 0.0f), false);
 		}
 
 	}

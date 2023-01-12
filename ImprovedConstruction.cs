@@ -107,7 +107,7 @@ namespace Improved_Construction
 					payload["wingdings.construction.selection2"] = typeSelected;
 					payload["constructionType"] =  "wingdings.customconstruction";
 
-					int limt = player.ActiveColony?.BuilderSizeLimit ?? Colony.BUILDER_LIMIT_START;
+					int limt = player.ActiveColonyGroup?.BuilderSizeLimit ?? 1000;
 
 					GenericCommandToolSettings data = new GenericCommandToolSettings()
 					{

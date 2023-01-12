@@ -137,7 +137,11 @@ namespace ExtendedBuilder.Persistence
 						{
 							for (int z = 0; z < zSize; z++)
 							{
-								blocks[x, y, z] = typesTransformation.GetValueOrDefault(compressed.ReadVariableUShort(), BuiltinBlocks.Indices.missingerror);
+								ushort blockValue;
+								bool found = typesTransformation.TryGetValue(compressed.ReadVariableUShort(), out blockValue);
+								if (!found)
+									blockValue = BuiltinBlocks.Indices.missingerror;
+								blocks[x, y, z] = blockValue;
 							}
 						}
 					}

@@ -8,6 +8,7 @@ using BlockTypes;
 using ModLoaderInterfaces;
 using static ItemTypes;
 using System;
+using Shared;
 
 namespace ExtendedBuilder.Jobs
 {
@@ -37,7 +38,7 @@ namespace ExtendedBuilder.Jobs
 
 			if (bpi == null)
 			{
-				state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+				state.SetIndicator(IndicatorState.NewIdleIndicator(5f));
 				AreaJobTracker.RemoveJob(areaJob);
 				return;
 			}
@@ -45,7 +46,7 @@ namespace ExtendedBuilder.Jobs
 			if (bpi.BuilderSchematic == null)
 			{
 				Log.Write("<color=red>SchematicIterator.BuilderSchematic == NULL</color>");
-				state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+				state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 				AreaJobTracker.RemoveJob(areaJob);
 				return;
 			}
@@ -75,7 +76,7 @@ namespace ExtendedBuilder.Jobs
 
 				if (buildType == null)
 				{
-					state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+					state.SetIndicator(IndicatorState.NewItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 					AreaJobTracker.RemoveJob(areaJob);
 					return;
 				}
@@ -94,13 +95,13 @@ namespace ExtendedBuilder.Jobs
 							if (_needsChunkLoaded.Contains(bpi))
 								_needsChunkLoaded.Remove(bpi);
 
-							state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+							state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 							AreaJobTracker.RemoveJob(areaJob);
 							return;
 						}
 					}
 
-					Stockpile ownerStockPile = areaJob.Owner.Stockpile;
+					Stockpile ownerStockPile = areaJob.Owner.ColonyGroup.Stockpile;
 
 					bool stockpileContainsBuildItem = buildType.ItemIndex == BuiltinBlocks.Indices.air;
 
@@ -152,14 +153,14 @@ namespace ExtendedBuilder.Jobs
 							if (!_needsChunkLoaded.Contains(bpi))
 								_needsChunkLoaded.Add(bpi);
 
-							state.SetIndicator(new Shared.IndicatorState(5f, buildType.Name));
-							ChunkQueue.QueuePlayerSurrounding(iterationType.CurrentPosition.ToChunk());
+							state.SetIndicator(IndicatorState.NewItemIndicator(5f, buildType.ItemIndex));
+							//ChunkQueue.QueuePlayerSurrounding(iterationType.CurrentPosition.ToChunk()); //TODO See if chunk needs to be queued manually
 							return;
 						}
 					}
 					else
 					{
-						state.SetIndicator(new Shared.IndicatorState(5f, buildType.Name, true, false));
+						state.SetIndicator(IndicatorState.NewItemIndicator(5f, buildType.ItemIndex));
 						return;
 					}
 				}
@@ -168,17 +169,17 @@ namespace ExtendedBuilder.Jobs
 					if (!_needsChunkLoaded.Contains(bpi))
 						_needsChunkLoaded.Add(bpi);
 
-					ChunkQueue.QueuePlayerSurrounding(iterationType.CurrentPosition.ToChunk());
-					state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+					//ChunkQueue.QueuePlayerSurrounding(iterationType.CurrentPosition.ToChunk()); //TODO See if chunk needs to be queued manually
+					state.SetIndicator(IndicatorState.NewIdleIndicator(5f));
 					return;
 				}
 
 				if (iterationType.MoveNext())
 				{
 					if (buildType.ItemIndex != BlockTypes.BuiltinBlocks.Indices.air)
-						state.SetIndicator(new Shared.IndicatorState(GetCooldown(), buildType.ItemIndex));
+						state.SetIndicator(IndicatorState.NewItemIndicator(GetCooldown(), buildType.ItemIndex));
 					else
-						state.SetIndicator(new Shared.IndicatorState(GetCooldown(), foundTypeIndex));
+						state.SetIndicator(IndicatorState.NewItemIndicator(GetCooldown(), foundTypeIndex));
 
 					return;
 				}
@@ -188,7 +189,7 @@ namespace ExtendedBuilder.Jobs
 						_needsChunkLoaded.Remove(bpi);
 
 					// failed to find next position to do job at, self-destruct
-					state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+					state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 					AreaJobTracker.RemoveJob(areaJob);
 					return;
 				}
@@ -196,7 +197,7 @@ namespace ExtendedBuilder.Jobs
 
 			if (iterationType.MoveNext())
 			{
-				state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+				state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 				return;
 			}
 			else
@@ -205,7 +206,7 @@ namespace ExtendedBuilder.Jobs
 					_needsChunkLoaded.Remove(bpi);
 
 				// failed to find next position to do job at, self-destruct
-				state.SetIndicator(new Shared.IndicatorState(5f, BuiltinBlocks.Types.erroridle.Name));
+				state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.erroridle));
 				AreaJobTracker.RemoveJob(areaJob);
 				return;
 			}

@@ -49,14 +49,14 @@ namespace Improved_Construction
 			}
 			else
 			{
-				Stockpile stockpile = areaJob.Owner.Stockpile;
+				Stockpile stockpile = areaJob.Owner.ColonyGroup.Stockpile;
 				int num = 4096;
 				while (num-- > 0)
 				{
 					Vector3Int currentPosition = iterationType.CurrentPosition;
 					if (!currentPosition.IsValid)
 					{
-						state.SetIndicator(new IndicatorState(5f, BuiltinBlocks.Indices.erroridle, false, true), true);
+						state.SetIndicator(IndicatorState.NewIdleIndicator(5f), true);
 						AreaJobTracker.RemoveJob(areaJob);
 						return;
 					}
@@ -97,8 +97,8 @@ namespace Improved_Construction
 						if (!stockpile.Contains(this.buildType.ItemIndex, 1))
 						{
 							float num2 = Random.NextFloat(5f, 8f);
-							job.Owner.Stats.RecordNPCIdleSeconds(job.NPCType, num2);
-							state.SetIndicator(new IndicatorState(num2, this.buildType.ItemIndex, true, false), true);
+							job.Owner.Statistics.RecordNPCIdleTime(job.NPCType, num2);
+							state.SetIndicator(IndicatorState.NewItemIndicator(5f, buildType.ItemIndex), true);
 							return;
 						}
 
@@ -113,7 +113,7 @@ namespace Improved_Construction
 							ModLoader.Callbacks.OnNPCGathered.Invoke((IJob)job, currentPosition, ReplacerSpecial.GatherResults);
 							InventoryItem weightedRandom = ItemTypes.ItemTypeDrops.GetWeightedRandom(ReplacerSpecial.GatherResults);
 							if (weightedRandom.Amount > 0)
-								state.SetIndicator(new IndicatorState(cooldown, weightedRandom.Type, false, true), true);
+								state.SetIndicator(IndicatorState.NewItemIndicator(cooldown, weightedRandom.Type), true);
 							else
 								state.SetCooldown((double)cooldown);
 							state.Inventory.Add((IList<ItemTypes.ItemTypeDrops>)ReplacerSpecial.GatherResults);
@@ -125,14 +125,14 @@ namespace Improved_Construction
 							state.JobIsDone = true;
 							return;
 						}
-						state.SetIndicator(new IndicatorState(5f, BuiltinBlocks.Indices.missingerror, true, false), true);
+						state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.air), true); //TODO, not sure what indicator was used previously
 						return;
 
 
 					}
 					else
 					{
-						state.SetIndicator(new IndicatorState(5f, BuiltinBlocks.Indices.missingerror, true, false), true);
+						state.SetIndicator(IndicatorState.NewMissingItemIndicator(5f, BuiltinBlocks.Indices.missingerror), true);
 						return;
 					}
 				}

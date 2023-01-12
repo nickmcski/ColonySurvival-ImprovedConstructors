@@ -123,7 +123,7 @@ namespace Improved_Construction
 					{
 				{"constructionType",  StructureBuilderLoader.NAME },
 				{StructureBuilderLoader.NAME + ".StructureName", structureName },
-				{StructureBuilderLoader.NAME + ".Rotation", Structure.Rotation.Front },//TODO Take player facing direction??
+				{StructureBuilderLoader.NAME + ".Rotation", (int) Structure.Rotation.Front },//TODO Take player facing direction??
 			};
 
 			SelectedArea selection = setSelection(data.Player, location, maxSize, args);
@@ -230,7 +230,7 @@ namespace Improved_Construction
 			JObject args = new JObject()
 					{
 				{"constructionType",  StructureBuilderLoader.NAME },
-				{StructureBuilderLoader.NAME + ".Rotation", selected.rotation },
+				{StructureBuilderLoader.NAME + ".Rotation", (int) selected.rotation },
 			};
 
 			ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
@@ -264,7 +264,7 @@ namespace Improved_Construction
 					{
 						Vector3Int ChunkPos = new Vector3Int(x, y, z);
 						Chunk chunk = World.GetChunk(ChunkPos);
-						chunk.SendToReceivingPlayers(p);
+						//chunk.SendToReceivingPlayers(p); //TODO Fix clearing the chunk
 						Log.Write("Sending chunks to players!");
 					}
 				}
@@ -284,7 +284,7 @@ namespace Improved_Construction
 				JObject args = new JObject()
 					{
 				{"constructionType",  StructureBuilderLoader.NAME },
-				{StructureBuilderLoader.NAME + ".Rotation", selected.rotation },
+				{StructureBuilderLoader.NAME + ".Rotation", (int) selected.rotation },
 			};
 
 				ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
@@ -302,7 +302,7 @@ namespace Improved_Construction
 
 			//Fallback to clear current position
 			Chunk chunk = World.GetChunk(player.VoxelPosition.ToChunk());
-			chunk.SendToReceivingPlayers(player);
+			//chunk.SendToReceivingPlayers(player);  //TODO Fix clearing the chunk
 			return;
 		}
 
