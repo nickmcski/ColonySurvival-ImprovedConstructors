@@ -12,6 +12,10 @@
         "fileType": "addOrOverrideLocalization",
         "relativePath": "en-US.json"
       },
+			{
+				"fileType": "addOrOverrideLocalization",
+				"relativePath": "es-ES.json"
+			},
       {
         "fileType": "addNewTypes",
         "relativePath": "types.json"
