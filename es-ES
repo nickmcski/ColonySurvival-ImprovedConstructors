@@ -1,0 +1,42 @@
+{
+  "sentences": {
+    "wingdings": {
+      "tooljob": {
+        "replacer": "Reemplazar",
+        "replacera": "Sustituir un bloque por otro",
+        "replacerb": "Seleccione el bloque que desea eliminar y, a continuación, el bloque con el que debe rellenarse,",
+        "shapes": "Formas personalizadas",
+        "walls": "Muros",
+        "wallsa": "Construye los muros exteriores",
+        "wallsb": "Seleccione el material que desea utilizar y, a continuación, seleccione la zona para construir los muros.",
+        "pyramid": "Pirámide",
+        "pyramida": "Construye una pirámide hueca en tu selección",
+        "pyramidb": "Seleccione el material que desea utilizar y, a continuación, seleccione la zona para construir.",
+        "circle": "Círculo",
+        "circlea": "Construye un cilindro vertical",
+        "circleb": "Seleccione el material que desea utilizar, a continuación, la zona de construcción de su círculo",
+        "structure": "Plano de Blueprint",
+        "copytool": "Guardar Blueprint",
+        "copy":  "Seleccione la zona del Blueprint"
+      },
+      "research": {
+        "2d": {
+          "name": "Geometría básica",
+          "description": "¡Felicidades! Ha sido difícil, ¡pero tus colonos entienden lo que es un círculo!"
+        },
+        "3d": {
+          "name": "Geometría avanzada",
+          "description": "¿Eres más listo que un niño de 5º curso?"
+        }
+      },
+      "builder": {
+        "2d": "2D Builder",
+        "3d": "3D Builder"
+      },
+      "blueprint":
+      {
+        "copytext": "Seleccionar zona"
+      }
+    }
+  }
+}
