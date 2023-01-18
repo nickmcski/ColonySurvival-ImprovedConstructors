@@ -15,7 +15,7 @@ using static Players;
 namespace Improved_Construction
 {
 	[ModLoader.ModManager]
-	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IAfterSelectedWorld
+	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IAfterSelectedWorld, IOnPlayerSelectedTypePopup
 	{
 		[ModLoader.ModCallback("wingdings_load", 20f)]
 		public void AfterSelectedWorld()
@@ -87,14 +87,17 @@ namespace Improved_Construction
 			}
 		}
 
-		[ModLoader.ModCallback(ModLoader.EModCallbackType.OnPlayerSelectedTypePopup, "traderule")]
-		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JObject payload)
+		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JToken payload)
 		{
 			int result;
-			if (!payload.TryGetAs<int>("wingdings.construction.selection", out result))
+			if (payload == null)
 				return;
+			result = payload.Value<int?>("wingdings.construction.selection") ?? -1;
 			switch (result)
 			{
+				case -1:
+					//Don't care
+					return;
 				case 1:
 					payload["wingdings.construction.selection1"] =  typeSelected;
 					payload["wingdings.construction.selection"] = 2;
@@ -113,7 +116,7 @@ namespace Improved_Construction
 
 					GenericCommandToolSettings data = new GenericCommandToolSettings()
 					{
-						JSONData = payload,
+						JSONData = (JObject) payload,
 						Maximum2DBlockCount = limt,
 						Minimum2DBlockCount = 1,
 						Maximum3DBlockCount = limt,
@@ -123,7 +126,7 @@ namespace Improved_Construction
 						OneAreaOnly = true,
 						Key = "wingdings.customconstruction",
 						NPCTypeKey = "pipliz.digger",
-						TranslationKey = "Wingdings.customconstruction"
+						TranslationKey = "wingdings.tooljob.replacer"
 					};
 					CommandToolManager.StartCommandToolSelection(player, data);
 					break;

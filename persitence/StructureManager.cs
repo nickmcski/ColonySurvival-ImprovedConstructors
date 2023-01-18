@@ -91,7 +91,8 @@ namespace ExtendedBuilder.Persistence
 				return false;
 
 			structure.Save(name);
-			LoadStructures();
+			_structures.Add(name, structure);
+			//LoadStructures();
 
 			return true;
 		}

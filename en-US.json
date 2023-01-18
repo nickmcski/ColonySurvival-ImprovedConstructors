@@ -15,7 +15,9 @@
         "circle": "Circle",
         "circlea": "Builds a verticle cylinder",
         "circleb": "Select the material you want to use, then the area your circle should be built",
-        "structure": "Blueprints"
+        "structure": "Place Blueprint",
+        "copytool": "Save Blueprint",
+        "copy":  "Select Blueprint Area"
       },
       "research": {
         "2d": {
@@ -30,6 +32,10 @@
       "builder": {
         "2d": "2D Builder",
         "3d": "3D Builder"
+      },
+      "blueprint":
+      {
+        "copytext": "Select Area"
       }
     }
   }

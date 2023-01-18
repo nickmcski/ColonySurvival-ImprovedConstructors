@@ -1,5 +1,7 @@
 ﻿using Jobs;
 using Jobs.Implementations.Construction;
+using Newtonsoft.Json.Linq;
+using NPC;
 using Pipliz;
 using System;
 using System.Collections.Generic;
@@ -15,5 +17,7 @@ namespace Improved_Construction
 		{
 			Identifier = "wingdings.customconstruction";
 		}
+
+
 	}
 }

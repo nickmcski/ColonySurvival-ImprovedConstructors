@@ -1,4 +1,5 @@
-﻿using MeshedObjects;
+﻿using Chatting;
+using MeshedObjects;
 using Newtonsoft.Json.Linq;
 using Pipliz;
 using Shared;
@@ -76,28 +77,28 @@ namespace Improved_Construction.motion
 				OnRemove();
 				return false;
 			}
-			//VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(Position.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
+			VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(nextPosition.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
 			//return true;
-			int maxPerUpdate = 10 * 1;
-			while (NextUpdate.IsPassed)
-			{
-				if (maxPerUpdate-- == 0)
-				{
-					NextUpdate = ServerTimeStamp.Now.Add(UPDATE_DELAY);
-					break;
-				}
-				Position = nextPosition;
+			//int maxPerUpdate = 10 * 1;
+			//while (NextUpdate.IsPassed)
+			//{
+			//	if (maxPerUpdate-- == 0)
+			//	{
+			//		NextUpdate = ServerTimeStamp.Now.Add(UPDATE_DELAY);
+			//		break;
+			//	}
+			//	Position = ;
 
-				LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
-				NextUpdate = NextUpdate.Add(UpdateDelayMS * 4);
-				continue;
+			//	LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
+			//	NextUpdate = NextUpdate.Add(UpdateDelayMS * 4);
+			//	continue;
 
-			}
-			if (Pipliz.Time.SecondsSinceStartDoubleThisFrame - (double)Settings.BackupSendingTimeoutSeconds > LastSendRealTime)
-			{
-				VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(Position.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
-				LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
-			}
+			//}
+			//if (Pipliz.Time.SecondsSinceStartDoubleThisFrame - (double)Settings.BackupSendingTimeoutSeconds > LastSendRealTime)
+			//{
+			//	VehicleDescription.Object.SendMoveToInterpolatedRenderDistance(nextPosition.Vector, Rotation, Settings.MeshedSettings, UpdateDelayMS);
+			//	LastSendRealTime = Pipliz.Time.SecondsSinceStartDoubleThisFrame;
+			//}
 			return true;
 		}
 
@@ -106,6 +107,7 @@ namespace Improved_Construction.motion
 
 		void TransportManager.ITransportVehicle.ProcessInputs(Players.Player player, Pipliz.Collections.SortedList<EInputKey, float> keyTimes, float deltaTime)
 		{
+			
 			if (keyTimes.Count == 0)
 			{
 				if (samePosition < UPDATE_DELAY)
@@ -129,7 +131,7 @@ namespace Improved_Construction.motion
 
 			foreach (KeyValuePair<EInputKey, float> Key in keyTimes)
 			{
-				input += Key.Key.ToString() + "_" + Key.Value + ";";
+				input += Key.Key.ToString() + ";";
 
 				switch (Key.Key)
 				{
@@ -156,10 +158,11 @@ namespace Improved_Construction.motion
 						offset.y -= 1;
 						break;
 				}
-				UnityEngine.Quaternion rotation = player.Rotation;
-
-				offset = rotateInput(offset, rotation);
 			}
+			//Chat.SendToConnected(keyTimes.Count.ToString() + " " + input + " " + offset.ToString());
+			UnityEngine.Quaternion rotation = player.Rotation;
+
+			offset = rotateInput(offset, rotation);
 
 
 
@@ -178,7 +181,7 @@ namespace Improved_Construction.motion
 		{
 			//((DozerMover)Mover).CoreTransform.position += offset.Vector;
 
-			nextPosition = Position + offset;
+			nextPosition = nextPosition + offset;
 
 			if (selection != null)
 			{
@@ -228,7 +231,7 @@ namespace Improved_Construction.motion
 		private bool IsValid;
 		private Pipliz.Vector3Int Position;
 		private Pipliz.Vector3Int nextPosition;
-		private int UpdateDelayMS = 200;
+		private int UpdateDelayMS = 100;
 		private Quaternion Rotation;
 
 		public void setPlacer(ConstructionPlacer placer)

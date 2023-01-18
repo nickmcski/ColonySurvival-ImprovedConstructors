@@ -58,10 +58,10 @@ namespace Improved_Construction.motion
 
 		public void OnPlayerClicked(Players.Player player, PlayerClickedData click)
 		{
-			Log.Write("CLICK" + click.HitType.ToString());
+			//Log.Write("CLICK" + click.HitType.ToString());
 			if (click.IsHoldingButton || (click.ClickType != PlayerClickedData.EClickType.Right || click.OnBuildCooldown) || (click.HitType != PlayerClickedData.EHitType.Block || (int)click.TypeSelected != (int)ItemTypes.GetType("ghost").ItemIndex))
 				return;
-			Log.WriteWarning("CLICKED!");
+			//Log.WriteWarning("CLICKED!");
 			click.ConsumedType = PlayerClickedData.EConsumedType.UsedAsTool;
 			Dozer.CreateGlider(click.GetExactHitPositionWorld() + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.Euler(0, -90, 0), DozerTransport.CreateVehicleDescription(MeshedObjectID.GetNew()), player);
 		}
@@ -83,10 +83,10 @@ namespace Improved_Construction.motion
 				Players.Player playerInside)
 		{
 
-			Log.Write("Start creating Dozer");
+			//Log.Write("Start creating Dozer");
 			DozerSettings settings = new DozerSettings();
 			DozerTransport vehicle1 = DozerTransport.CreateDozer(spawnPosition, rotation, vehicle, playerInside, settings);
-			Log.Write("Created Dozer!" + vehicle1.ToString());
+			//Log.Write("Created Dozer!" + vehicle1.ToString());
 			MeshedObjectManager.Attach(playerInside, vehicle);
 			return vehicle1;
 		}

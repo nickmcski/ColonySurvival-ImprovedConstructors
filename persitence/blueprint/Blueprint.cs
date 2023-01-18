@@ -12,7 +12,8 @@ namespace ExtendedBuilder.Persistence
 		private int zSize;
 		public Dictionary<ushort, string> types = new Dictionary<ushort, string>();
 		private ushort[,,] blocks;
-		public Vector3Int playerMod;
+		private int schemaVersion = 1;
+		public string creator;
 
 		public override int GetMaxX() { return xSize - 1; }
 
@@ -68,6 +69,39 @@ namespace ExtendedBuilder.Persistence
 		{
 			return blocks[x, y, z];
 		}
+		public Blueprint(Vector3Int min, Vector3Int max) : this(min, max, "") { }
+
+		public Blueprint(Vector3Int min, Vector3Int max, string creator) : base()
+		{
+			this.creator = creator;
+			Vector3Int size = max - min;
+			xSize = size.x;
+			ySize = size.y;
+			zSize = size.z;
+
+			blocks = new ushort[size.x + 1, size.y + 1, size.z + 1];
+
+			for (int x = 0; x <= size.x; x++)
+			{
+				for (int y = 0; y <= size.y; y++)
+				{
+					for (int z = 0; z <= size.z; z++)
+					{
+						Vector3Int newPos = new Vector3Int(min.x + x, min.y + y, min.z + z);
+						//ushort type = structure.GetBlock(x, y, z);
+						World.TryGetTypeAt(newPos, out ItemTypes.ItemType val);
+						if (val == null)
+							continue;
+						ushort type = val.ItemIndex;
+
+						if (!types.ContainsKey(type))
+							types.Add(type, ItemTypes.IndexLookup.GetName(type));
+
+						blocks[x, y, z] = type;
+					}
+				}
+			}
+		}
 
 		public Blueprint(Structure structure) : base(structure)
 		{
@@ -93,8 +127,6 @@ namespace ExtendedBuilder.Persistence
 					}
 				}
 			}
-
-			playerMod = new Vector3Int(0, 0, 0);
 		}
 
 		public Blueprint(string file) : base(file)
@@ -103,7 +135,8 @@ namespace ExtendedBuilder.Persistence
 
 			using (ByteReader raw = ByteReader.Get(binaryBlueprint))
 			{
-				playerMod = raw.ReadVariableVector3Int();
+				schemaVersion = raw.ReadVariableInt();
+				creator = raw.ReadOptionalString();
 				int typesC = raw.ReadVariableInt();
 
 				xSize = raw.ReadVariableInt();
@@ -123,7 +156,11 @@ namespace ExtendedBuilder.Persistence
 						ushort new_type_index;
 
 						if (!ItemTypes.IndexLookup.TryGetIndex(type_name, out new_type_index))
+						{
 							new_type_index = BuiltinBlocks.Indices.missingerror;
+							Log.Write(string.Format("<color=red>Blueprint Error: {0} contains invalid item {1}</color>", file, type_name));
+						}
+							
 
 						typesTransformation.Add(type_index, new_type_index);
 						if(!types.ContainsKey(new_type_index))
@@ -155,8 +192,8 @@ namespace ExtendedBuilder.Persistence
 		{
 			using (ByteBuilder builder = ByteBuilder.Get())
 			{
-				builder.WriteVariable(playerMod);
-
+				builder.WriteVariable(schemaVersion);
+				builder.WriteOptionalString(creator);
 				builder.WriteVariable(types.Count);
 
 				builder.WriteVariable(xSize);

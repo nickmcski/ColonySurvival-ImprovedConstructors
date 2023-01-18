@@ -8,6 +8,7 @@ using Jobs.Implementations.Construction;
 using MeshedObjects;
 using ModLoaderInterfaces;
 using NetworkUI;
+using NetworkUI.AreaJobs;
 using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
@@ -22,6 +23,9 @@ namespace Improved_Construction
 	[ChatCommandAutoLoader]
 	public class ConstructionPlacer : IChatCommand, IOnPlayerPushedNetworkUIButton, IOnSendAreaHighlights, IOnConstructTooltipUI, IOnConstructCommandTool
 	{
+
+		public static bool DISBALE_BLUEPRINTS = false;
+
 		public static void SendSelectionMenu(Players.Player player)
 		{
 			NetworkMenu menu = new NetworkMenu();
@@ -53,6 +57,7 @@ namespace Improved_Construction
 			menu.Items.Add(table);
 			NetworkMenuManager.SendServerPopup(player, menu);
 		}
+
 
 		public static IItem GetButtonItem(string structureName)
 		{
@@ -177,10 +182,8 @@ namespace Improved_Construction
 			if (selected == null)
 				return;
 
-			JObject args = new JObject()
-					{
-				{"constructionType",  StructureBuilderLoader.NAME },
-			};
+			JObject args = (JObject) selected.args;
+			args["constructionType"] = StructureBuilderLoader.NAME;
 
 			AreaJobTracker.CreateNewAreaJob("pipliz.constructionarea", args, player.ActiveColony, selected.Minimum, selected.Maximum);
 			selectionTracker.Remove(player);
@@ -194,6 +197,9 @@ namespace Improved_Construction
 				vehicle.Object.SendRemoval(UnityEngine.Vector3Int.zero);
 			}
 
+			//Switch tool to Construction worker
+			NetworkUI.AreaJobs.IToolDescription ConstructionWorker = CommandToolManager.AreaDescriptions["constructionjob"];
+			CommandToolManager.StartCommandToolSelection(player, (BlockToolDescriptionSettings) ConstructionWorker);
 		}
 
 		public static SelectedArea GetSelected(Player player)
@@ -280,21 +286,16 @@ namespace Improved_Construction
 				SelectedArea selected = GetSelected(player);
 				if (selected == null)
 					return;
-
-				JObject args = new JObject()
-					{
-				{"constructionType",  StructureBuilderLoader.NAME },
-				{StructureBuilderLoader.NAME + ".Rotation", (int) selected.rotation },
-			};
+			
 
 				ConstructionArea area = new ConstructionArea(null, null, selected.Minimum, selected.Maximum);
-				area.SetArgument(args);
-				string structureName;
-				if (!args.TryGetAs<string>(StructureBuilderLoader.NAME + ".StructureName", out structureName))
-				{
-					Log.WriteError("Could not get structure!");
-					return;
-				}
+				area.SetArgument((JObject)selected.args);
+				//string structureName;
+				//if (selected.args[StructureBuilderLoader.NAME + ".StructureName"] != null)
+				//{
+				//	Log.WriteError("Could not get structure!");
+				//	return;
+				//}
 				GhostHelper.FillGhost((StructureIterator)area.IterationType, BuiltinBlocks.Types.air);
 				//ClearChunk(selection.cornerMin, selection.cornerMax, player);
 				return;
@@ -309,25 +310,24 @@ namespace Improved_Construction
 		[ModLoader.ModCallback("wingdings_blueprints", 10f)]
 		public void OnConstructCommandTool(Player p, NetworkMenu menu, string menuName)
 		{
+			if (DISBALE_BLUEPRINTS)
+				return;
+
 			if (menuName != "popup.tooljob.construction")
 				return;
 			menu.Items.Add((IItem)new EmptySpace(20));
-
-			List<(IItem, int)> Items = new List<(IItem, int)>();
-			Items.Add(((IItem)new Label(new LabelData("", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), -1, 0.0f, 0.0f)
-			{
-				Width = 80
-			}, 80));
 
 			bool unlocked = CommandToolManager.NPCAreaUnlocked(p, "pipliz.builder", out ScienceKey? _);
 			ButtonCallback button = new ButtonCallback("wingdings.blueprints", new LabelData("wingdings.tooljob.structure", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 410, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
 			{
 				Enabled = unlocked
 			};
-			Items.Add((button, 410));
+			ButtonCallback button2 = new ButtonCallback("wingdings.copytool", new LabelData("wingdings.tooljob.copytool", ELabelAlignment.Default, 16, LabelData.ELocalizationType.Sentence), 410, 45, ButtonCallback.EOnClickActions.None, (JToken)null, 0.0f, 0.0f, true)
+			{
+				Enabled = unlocked
+			};
 
-			HorizontalRow horizontalRow = new HorizontalRow(Items, 45);
-			menu.Items.Add((IItem)horizontalRow);
+			CommandToolManager.GenerateTwoColumnCenteredRow(menu, button, button2);
 		}
 	}
 }

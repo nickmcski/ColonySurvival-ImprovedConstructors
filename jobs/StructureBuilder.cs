@@ -118,6 +118,16 @@ namespace ExtendedBuilder.Jobs
 						stockpileContainsBuildItem = true;
 					}
 
+					//Skip the following items
+					if(!stockpileContainsBuildItem && 
+						buildType == BuiltinBlocks.Types.missingerror
+						)
+					{
+						iterationType.MoveNext();
+
+						continue;
+					}
+
 					//TODO Check if buildType .isPlaceable() 
 
 					if (stockpileContainsBuildItem)
