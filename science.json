@@ -2,7 +2,7 @@
 	{
 		"colonyPointRequirement": 6000,
 		"dependencies": [
-			"pipliz.baseresearch.constructionbuilder"
+			"pipliz.constructionbuilder"
 		],
 		"icon": "./textures/Basic-Geometry.png",
 		"iterationCount": 0,

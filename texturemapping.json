@@ -7,6 +7,6 @@
 		"folderNormal": "./textures/"
 	},
 	"ghost": {
-		"albedo": "green_stained_glass"
+		"albedo": "ghost"
 	}
 }

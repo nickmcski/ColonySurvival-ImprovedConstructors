@@ -5,7 +5,7 @@
     "version": "0.1.0.0",
     "marksgamemodded": true,
     "compatibleversions": [
-      "0.8.0"
+      "0.9.0"
     ],
     "jsonFiles": [
       {
@@ -21,12 +21,12 @@
         "relativePath": "texturemapping.json"
       },
       {
-        "fileType" : "addOrReplaceNPCTypes",
-        "relativePath" : "npcTypes.json"
+        "fileType": "addOrReplaceNPCTypes",
+        "relativePath": "npcTypes.json"
       },
       {
-        "fileType" : "addScience",
-        "relativePath" : "science.json"
+        "fileType": "addScience",
+        "relativePath": "science.json"
       }
     ]
   }

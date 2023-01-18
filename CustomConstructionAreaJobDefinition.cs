@@ -1,7 +1,8 @@
 ﻿using Jobs;
 using Jobs.Implementations.Construction;
+using Newtonsoft.Json.Linq;
+using NPC;
 using Pipliz;
-using Pipliz.JSON;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,13 @@ using System.Threading.Tasks;
 
 namespace Improved_Construction
 {
-    public class CustomConstructionAreaJobDefinition : ConstructionAreaDefinition
-    {
-        public CustomConstructionAreaJobDefinition()
-        {
-            Identifier = "wingdings.customconstruction";
-        }
-    }
+	public class CustomConstructionAreaJobDefinition : ConstructionAreaDefinition
+	{
+		public CustomConstructionAreaJobDefinition()
+		{
+			Identifier = "wingdings.customconstruction";
+		}
+
+
+	}
 }

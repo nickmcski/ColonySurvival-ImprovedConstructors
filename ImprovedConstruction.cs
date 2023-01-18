@@ -6,18 +6,19 @@ using NetworkUI.AreaJobs;
 using NetworkUI.Items;
 using Newtonsoft.Json.Linq;
 using Pipliz;
-using Pipliz.JSON;
 using Science;
 using Shared;
 using System;
 using System.Reflection;
+using static Players;
 
 namespace Improved_Construction
 {
 	[ModLoader.ModManager]
-	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IOnPlayerSelectedTypePopup, IOnAssemblyLoaded
+	public class ImprovedConstruction : IOnConstructCommandTool, IOnPlayerPushedNetworkUIButton, IAfterSelectedWorld, IOnPlayerSelectedTypePopup
 	{
-		public void OnAssemblyLoaded(string path)
+		[ModLoader.ModCallback("wingdings_load", 20f)]
+		public void AfterSelectedWorld()
 		{
 			//Register loader for Construction job callback
 			ConstructionArea.RegisterLoader((IConstructionLoader)new ReplacerSpecialLoader());
@@ -38,7 +39,8 @@ namespace Improved_Construction
 			CommandToolManager.AddButtonTooltip("wingdings.tooljob.circle", "wingdings.tooljob.circlea", "wingdings.tooljob.circleb");
 		}
 
-		public void OnConstructCommandTool(Players.Player p, NetworkMenu menu, string menuName)
+		[ModLoader.ModCallback("wingdings_shapes", 5f)]
+		public void OnConstructCommandTool(Player p, NetworkMenu menu, string menuName)
 		{
 			if (menuName != "popup.tooljob.construction")
 				return;
@@ -71,8 +73,11 @@ namespace Improved_Construction
 			switch (data.ButtonIdentifier)
 			{
 				case "wingdings.replacer":
-					JSONNode payload = new JSONNode(NodeType.Object).SetAs<int>("wingdings.construction.selection", 1);
-					NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, payload);
+					JObject jObjects = new JObject()
+					{
+						{"wingdings.construction.selection", 1 }
+					};
+					NetworkMenuManager.TriggerTypeSelectionPopup(data.Player, 640, 480, EAreaItemSelectionFilter.ComboDiggable, jObjects);
 					return;
 				case "windings.shapes":
 					SendShapeMenu(data.Player);
@@ -82,16 +87,20 @@ namespace Improved_Construction
 			}
 		}
 
-		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JSONNode payload)
+		public void OnPlayerSelectedTypePopup(Players.Player player, ushort typeSelected, JToken payload)
 		{
 			int result;
-			if (!payload.TryGetAs<int>("wingdings.construction.selection", out result))
+			if (payload == null)
 				return;
+			result = payload.Value<int?>("wingdings.construction.selection") ?? -1;
 			switch (result)
 			{
+				case -1:
+					//Don't care
+					return;
 				case 1:
-					payload.SetAs<int>("wingdings.construction.selection1", typeSelected);
-					payload.SetAs<int>("wingdings.construction.selection", 2);
+					payload["wingdings.construction.selection1"] =  typeSelected;
+					payload["wingdings.construction.selection"] = 2;
 
 					//Send blank menu. TriggerTypeSelectionPopup will only work when a menu is open
 					NetworkMenu menu = new NetworkMenu();
@@ -100,14 +109,14 @@ namespace Improved_Construction
 					NetworkMenuManager.TriggerTypeSelectionPopup(player, 640, 480, EAreaItemSelectionFilter.ComboBuildable, payload);
 					break;
 				case 2:
-					payload.SetAs<int>("wingdings.construction.selection2", typeSelected);
-					payload.SetAs<string>("constructionType", "wingdings.customconstruction");
+					payload["wingdings.construction.selection2"] = typeSelected;
+					payload["constructionType"] =  "wingdings.customconstruction";
 
-					int limt = player.ActiveColony?.BuilderSizeLimit ?? Colony.BUILDER_LIMIT_START;
+					int limt = player.ActiveColonyGroup?.BuilderSizeLimit ?? 1000;
 
 					GenericCommandToolSettings data = new GenericCommandToolSettings()
 					{
-						JSONData = payload,
+						JSONData = (JObject) payload,
 						Maximum2DBlockCount = limt,
 						Minimum2DBlockCount = 1,
 						Maximum3DBlockCount = limt,
@@ -117,7 +126,7 @@ namespace Improved_Construction
 						OneAreaOnly = true,
 						Key = "wingdings.customconstruction",
 						NPCTypeKey = "pipliz.digger",
-						TranslationKey = "Wingdings.customconstruction"
+						TranslationKey = "wingdings.tooljob.replacer"
 					};
 					CommandToolManager.StartCommandToolSelection(player, data);
 					break;

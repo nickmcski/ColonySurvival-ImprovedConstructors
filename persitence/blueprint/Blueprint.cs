@@ -1,0 +1,229 @@
+﻿using Pipliz;
+using System.Collections.Generic;
+using BlockTypes;
+using System.IO;
+
+namespace ExtendedBuilder.Persistence
+{
+	public class Blueprint : Structure
+	{
+		private int xSize;
+		private int ySize;
+		private int zSize;
+		public Dictionary<ushort, string> types = new Dictionary<ushort, string>();
+		private ushort[,,] blocks;
+		private int schemaVersion = 1;
+		public string creator;
+
+		public override int GetMaxX() { return xSize - 1; }
+
+		public override int GetMaxY() { return ySize - 1; }
+
+		public override int GetMaxZ() { return zSize - 1; }
+
+		public override void Rotate()
+		{
+			ushort[,,] newBlocks = new ushort[zSize + 1, ySize + 1, xSize + 1];
+
+			for (int y = 0; y < ySize; y++)
+			{
+				for (int x = 0; x < zSize; x++)
+				{
+					for (int z = 0; z < xSize; z++)
+					{
+						int newX = z;
+						int newZ = zSize - (x + 1);
+
+						string type = ItemTypes.IndexLookup.GetName(blocks[z, y, x]);
+						switch (type.Substring(type.Length - 2))
+						{
+							case "x+":
+								type = type.Replace("x+", "z+");
+								break;
+							case "x-":
+								type = type.Replace("x-", "z-");
+								break;
+							case "z+":
+								type = type.Replace("z+", "x-");
+								break;
+							case "z-":
+								type = type.Replace("z-", "x+");
+								break;
+							default:
+								break;
+						}
+
+						newBlocks[newZ, y, newX] = ItemTypes.GetType(type).ItemIndex;
+					}
+				}
+			}
+
+			blocks = newBlocks;
+
+			int tmpSize = xSize;
+			xSize = zSize;
+			zSize = tmpSize;
+		}
+
+		public override ushort GetBlock(int x, int y, int z)
+		{
+			return blocks[x, y, z];
+		}
+		public Blueprint(Vector3Int min, Vector3Int max) : this(min, max, "") { }
+
+		public Blueprint(Vector3Int min, Vector3Int max, string creator) : base()
+		{
+			this.creator = creator;
+			Vector3Int size = max - min;
+			xSize = size.x;
+			ySize = size.y;
+			zSize = size.z;
+
+			blocks = new ushort[size.x + 1, size.y + 1, size.z + 1];
+
+			for (int x = 0; x <= size.x; x++)
+			{
+				for (int y = 0; y <= size.y; y++)
+				{
+					for (int z = 0; z <= size.z; z++)
+					{
+						Vector3Int newPos = new Vector3Int(min.x + x, min.y + y, min.z + z);
+						//ushort type = structure.GetBlock(x, y, z);
+						World.TryGetTypeAt(newPos, out ItemTypes.ItemType val);
+						if (val == null)
+							continue;
+						ushort type = val.ItemIndex;
+
+						if (!types.ContainsKey(type))
+							types.Add(type, ItemTypes.IndexLookup.GetName(type));
+
+						blocks[x, y, z] = type;
+					}
+				}
+			}
+		}
+
+		public Blueprint(Structure structure) : base(structure)
+		{
+			xSize = structure.GetMaxX();
+			ySize = structure.GetMaxY();
+			zSize = structure.GetMaxZ();
+
+			blocks = new ushort[xSize + 1, ySize + 1, zSize + 1];
+
+			for (int x = 0; x <= xSize; x++)
+			{
+				for (int y = 0; y <= ySize; y++)
+				{
+					for (int z = 0; z <= zSize; z++)
+					{
+						Vector3Int newPos = new Vector3Int(x, y, z);
+						ushort type = structure.GetBlock(x, y, z);
+
+						if (!types.ContainsKey(type))
+							types.Add(type, ItemTypes.IndexLookup.GetName(type));
+
+						blocks[x, y, z] = type;
+					}
+				}
+			}
+		}
+
+		public Blueprint(string file) : base(file)
+		{
+			byte[] binaryBlueprint = File.ReadAllBytes(file);
+
+			using (ByteReader raw = ByteReader.Get(binaryBlueprint))
+			{
+				schemaVersion = raw.ReadVariableInt();
+				creator = raw.ReadOptionalString();
+				int typesC = raw.ReadVariableInt();
+
+				xSize = raw.ReadVariableInt();
+				ySize = raw.ReadVariableInt();
+				zSize = raw.ReadVariableInt();
+
+				//From one world to another
+				Dictionary<ushort, ushort> typesTransformation = new Dictionary<ushort, ushort>();
+
+				using (ByteReader compressed = raw.ReadCompressed())
+				{
+					for (int i = 0; i < typesC; i++)
+					{
+						ushort type_index = compressed.ReadVariableUShort();
+						string type_name = compressed.ReadString();
+
+						ushort new_type_index;
+
+						if (!ItemTypes.IndexLookup.TryGetIndex(type_name, out new_type_index))
+						{
+							new_type_index = BuiltinBlocks.Indices.missingerror;
+							Log.Write(string.Format("<color=red>Blueprint Error: {0} contains invalid item {1}</color>", file, type_name));
+						}
+							
+
+						typesTransformation.Add(type_index, new_type_index);
+						if(!types.ContainsKey(new_type_index))
+							types.Add(new_type_index, type_name);
+					} //type
+
+					blocks = new ushort[xSize, ySize, zSize];
+
+					for (int x = 0; x < xSize; x++)
+					{
+						for (int y = 0; y < ySize; y++)
+						{
+							for (int z = 0; z < zSize; z++)
+							{
+								ushort blockValue;
+								bool found = typesTransformation.TryGetValue(compressed.ReadVariableUShort(), out blockValue);
+								if (!found)
+									blockValue = BuiltinBlocks.Indices.missingerror;
+								blocks[x, y, z] = blockValue;
+							}
+						}
+					}
+
+				} //ByteReader compressed 
+			}
+		}
+
+		public override void Save(string name)
+		{
+			using (ByteBuilder builder = ByteBuilder.Get())
+			{
+				builder.WriteVariable(schemaVersion);
+				builder.WriteOptionalString(creator);
+				builder.WriteVariable(types.Count);
+
+				builder.WriteVariable(xSize);
+				builder.WriteVariable(ySize);
+				builder.WriteVariable(zSize);
+
+				using (ByteBuilder compressed = ByteBuilder.Get())
+				{
+					foreach (var key in types.Keys)
+					{
+						compressed.WriteVariable(key);
+						compressed.Write(types[key]);
+					}
+
+					for (int x = 0; x < xSize; x++)
+					{
+						for (int y = 0; y < ySize; y++)
+						{
+							for (int z = 0; z < zSize; z++)
+							{
+								compressed.WriteVariable(blocks[x, y, z]);
+							}
+						}
+					}
+
+					builder.WriteCompressed(compressed);
+				}
+
+				File.WriteAllBytes(StructureManager.Blueprint_FOLDER + name + ".b", builder.ToArray());
+			}
+		}
+	}
+}

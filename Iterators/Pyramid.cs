@@ -39,8 +39,8 @@ namespace Improved_Construction
 
 
 			return
-				(((location.x - offset == this.positionMin.x || location.x + offset == this.positionMax.x) && location.z - offset >= this.positionMin.z && location.z + offset <= this.positionMax.z) ||
-				 ((location.z - offset == this.positionMin.z || location.z + offset == this.positionMax.z) && location.x - offset >= this.positionMin.x && location.x + offset <= this.positionMax.x));
+					(((location.x - offset == this.positionMin.x || location.x + offset == this.positionMax.x) && location.z - offset >= this.positionMin.z && location.z + offset <= this.positionMax.z) ||
+					 ((location.z - offset == this.positionMin.z || location.z + offset == this.positionMax.z) && location.x - offset >= this.positionMin.x && location.x + offset <= this.positionMax.x));
 		}
 
 		public bool MoveNext()
